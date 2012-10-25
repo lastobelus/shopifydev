@@ -9,7 +9,7 @@ module Shopifydev
     
     def download(root=nil)
       root ||= Dir.pwd      
-      logger.info("Downloading all pages from #{shop.credentials['url']}")
+      shop.logger.info("Downloading all pages from #{shop.credentials['url']}")
     end
   end  
 end
