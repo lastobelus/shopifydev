@@ -1,6 +1,6 @@
 # Shopifydev
 
-TODO: Write a gem description
+Abstract out and port to ruby the functionality of the shopify textmate bundle for use in other editors.
 
 ## Installation
 
@@ -18,7 +18,6 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
 
 ## Contributing
 
