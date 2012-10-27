@@ -1,3 +1,6 @@
+require "logger"
+require "shopify_api"
+
 module Shopifydev
   class Shop
     attr_accessor :credentials, :logger
