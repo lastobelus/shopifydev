@@ -1,6 +1,6 @@
-require "shopifydev/version"
-require "shopifydev/shop"
-require "shopifydev/template"
+require_relative "shopifydev/version"
+require_relative "shopifydev/shop"
+require_relative "shopifydev/template"
 
 module Shopifydev
 end

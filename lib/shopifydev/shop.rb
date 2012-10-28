@@ -11,7 +11,7 @@ module Shopifydev
     
       ShopifyAPI::Base.site = "https://" + 
         credentials['api_key'] + ':' + 
-        credentials['secret'] + '@' + 
+        credentials['password'] + '@' + 
         credentials['url'] + '/admin' 
       logger.debug("set shopify site to #{ShopifyAPI::Base.site}")
     end
