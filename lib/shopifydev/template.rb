@@ -3,26 +3,40 @@ require 'fileutils'
 
 module Shopifydev
   class Template
-    
+
     attr_accessor :shop
-    
+
     def initialize(shop)
       @shop = shop
     end
-    
+
     def download(root=nil)
       root ||= FileUtils.pwd
       shop.logger.info("Downloading all pages from #{shop.credentials['url']}")
 
-      # TODO error handling goes here
-      response = ShopifyAPI::Asset.find(:all) # get all them assets
+      begin
+        response = ShopifyAPI::Asset.find(:all) # get all them assets
+        reproduce_template_locally(response)
+      rescue SocketError => e
+        puts e.message
+      rescue NoMethodError => e
+        puts "ShopifyAPI did not have a response. Try double checking your credentials?"
+      rescue ActiveResource::UnauthorizedAccess => e
+        puts e.message
+        puts "Make sure you have the right password set in .shopifydev.yaml"
+      end
+    end
+
+    def reproduce_template_locally(response)
 
       asset_files = get_list_of_assets(response)
 
-      asset_files.each do | file | 
+      asset_files.each do | file |
         file_info = file[:file_info]
 
-        folder_path = Pathname.new(tm_project_directory + directory_separator + file_info.dirname.to_path).realdirpath
+        folder_path = Pathname.new(tm_project_directory +
+                                   directory_separator +
+                                   file_info.dirname.to_path).realdirpath
         puts folder_path.join(file_info.basename).to_path
 
         unless (folder_path.exist?)
@@ -33,18 +47,19 @@ module Shopifydev
         # TODO error handling puleez
         asset = get_asset(file[:file_path])
 
-        File.open((folder_path + file_info.basename).to_path, 'w') do |f| 
-          # f.write(asset.value)
+        File.open((folder_path + file_info.basename).to_path, 'w') do |f|
+          f.write(asset.value)
         end
 
       end
-
     end
 
+    # TODO this should read from a file specified
     def tm_project_directory
       "/home/zeigfreid/github/shopifydev/tm_project"
     end
 
+    # TODO this should be platform independent
     def directory_separator
       "/"
     end
@@ -56,6 +71,8 @@ module Shopifydev
         pathname = Pathname.new(asset_info.attributes["key"])
         path_string = pathname.to_path
 
+        # TODO right now this returns entries with .css and .css.liquid
+        # but we only want .css.liquid
         if ".css" == pathname.extname
           puts "yeah"
           puts path_string + '.liquid' 
@@ -69,7 +86,6 @@ module Shopifydev
 
         puts path_string
         asset_files << { :file_path => path_string, :file_info => pathname }
-        gets
       end
 
       return asset_files

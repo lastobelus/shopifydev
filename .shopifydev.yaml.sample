@@ -1,0 +1,5 @@
+# rename this to .shopifydev.yaml and don't add live secrets here
+---
+api_key: youneedakey
+password: andapassword
+url: my_store_url.myshopify.com/
