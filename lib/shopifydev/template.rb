@@ -16,79 +16,59 @@ module Shopifydev
 
       begin
         response = ShopifyAPI::Asset.find(:all) # get all them assets
-        reproduce_template_locally(response)
+        get_list_of_assets(response).each {| key, file | write_local_copy(file) }
       rescue SocketError => e
         puts e.message
+        puts "Maybe check your internet connection?"
       rescue NoMethodError => e
-        puts "ShopifyAPI did not have a response. Try double checking your credentials?"
+        puts e.message
       rescue ActiveResource::UnauthorizedAccess => e
         puts e.message
         puts "Make sure you have the right password set in .shopifydev.yaml"
+      rescue Exception => e
+        puts e.message
       end
     end
 
-    def reproduce_template_locally(response)
+    def write_local_copy(file)
 
-      asset_files = get_list_of_assets(response)
+      folder_path = Pathname.new(tm_project_directory +
+                                 File::Separator +
+                                 file.dirname.to_path).realdirpath
 
-      asset_files.each do | file |
-        file_info = file[:file_info]
+      FileUtils.mkpath(folder_path.to_path) unless (folder_path.exist?)
 
-        folder_path = Pathname.new(tm_project_directory +
-                                   directory_separator +
-                                   file_info.dirname.to_path).realdirpath
-        puts folder_path.join(file_info.basename).to_path
+      begin
+        puts "downloading #{file.basename}"
+        asset = get_asset(file.to_path)
+      rescue SocketError => e
+        puts e.message
+        puts "The connection was interupted while downloading #{file.to_path}."
+      end
 
-        unless (folder_path.exist?)
-          FileUtils.mkpath(folder_path.to_path)
-
-        end
-
-        # TODO error handling puleez
-        asset = get_asset(file[:file_path])
-
-        File.open((folder_path + file_info.basename).to_path, 'w') do |f|
-          f.write(asset.value)
-        end
-
+      # TODO maybe this should compare timestamps?
+      File.open((folder_path + file.basename).to_path, 'w') do |f|
+        puts "writing #{file.basename}"
+        f.write(asset.value)
       end
     end
 
-    # TODO this should read from a file specified
     def tm_project_directory
-      "/home/zeigfreid/github/shopifydev/tm_project"
-    end
+      if ENV['TM_PROJECT_DIRECTORY'].nil?
+        raise 'TM_PROJECT_DIRECTORY: TextMate project directory is not set.'
+      end
 
-    # TODO this should be platform independent
-    def directory_separator
-      "/"
+      ENV['TM_PROJECT_DIRECTORY']
     end
 
     def get_list_of_assets(response)
-      asset_files = []
-
-      response.reverse.each do | asset_info |
+      response.reverse.inject({}) do | list, asset_info | 
         pathname = Pathname.new(asset_info.attributes["key"])
-        path_string = pathname.to_path
+      path = pathname.to_path
 
-        # TODO right now this returns entries with .css and .css.liquid
-        # but we only want .css.liquid
-        if ".css" == pathname.extname
-          puts "yeah"
-          puts path_string + '.liquid' 
-          puts asset_files.include?(path_string + '.liquid')
-          if asset_files.include?(path_string + '.liquid')
-
-            next
-
-          end
-        end
-
-        puts path_string
-        asset_files << { :file_path => path_string, :file_info => pathname }
+      list[path] = pathname unless list.keys.include?(path + '.liquid')
+      list
       end
-
-      return asset_files
     end
 
     def get_asset(key)
@@ -97,21 +77,3 @@ module Shopifydev
 
   end
 end
-
-
-=begin
-
-<ShopifyAPI::Asset:0x00000002b1f128 
-  @attributes={ 
-    "key"=>"assets/ajaxify-shop.js", 
-    "public_url"=>"http://static.shopify.com/s/files/1/0173/2198/t/3/assets/ajaxify-shop.js?0", 
-    "created_at"=>"2012-08-04T18:01:53-04:00", 
-    "updated_at"=>"2012-08-04T18:01:53-04:00", 
-    "content_type"=>"application/javascript", 
-    "size"=>7738
-  }, 
-  @prefix_options={}, 
-  @persisted=true>
-
-=end
-
