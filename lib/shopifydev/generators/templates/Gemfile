@@ -1,0 +1,10 @@
+source "http://rubygems.org"
+
+gem "mechanize"
+gem 'watchr'
+gem 'thor'
+gem 'shopify_api'
+gem "shopify-api-limits"
+gem 'guard'
+gem 'activesupport'
+gem 'inifile'
