@@ -11,8 +11,12 @@ module Shopifydev
       # Asset name should be relative to TM_PROJECT_DIRECTORY
       # but if it isn't, then gsub just doesn't replace anything
       # so if you know the key, you can just supply the key?
-      @remote_key = path.gsub(ENV['TM_PROJECT_DIRECTORY'] + '/', '')
-      @local_path = Pathname.new(ENV['TM_PROJECT_DIRECTORY'] + '/' + @remote_key)
+      unless ENV['TM_PROJECT_DIRECTORY'].nil?
+        @remote_key = path.gsub(ENV['TM_PROJECT_DIRECTORY'] + '/', '')
+        @local_path = Pathname.new(ENV['TM_PROJECT_DIRECTORY'] + '/' + @remote_key)
+      else
+        raise Exception, "TM_PROJECT_DIRECTORY is not set"
+      end
     end
 
     def upload(root=nil)

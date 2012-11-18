@@ -22,7 +22,7 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   test_shop = TestDriver.new
-  # test_shop.devshop.template.download
+  test_shop.devshop.template.download
 
   # upload a new asset by file name
   test_shop.devshop.asset('assets/example.css').upload
