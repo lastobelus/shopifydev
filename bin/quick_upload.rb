@@ -1,3 +1,5 @@
+#! /usr/bin/env ruby
+
 require_relative "lib/shopifydev.rb"
 require "shopify_api"
 
