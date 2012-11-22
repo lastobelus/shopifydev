@@ -34,7 +34,12 @@ module Shopifydev
 
       # TODO this doesn't fail spectacularly enough... I don't 
       # feel comfortable with that
-      asset.save if asset.valid?
+      if asset.valid?
+        asset.save 
+        puts "Success!"
+      else
+        puts "Failure! Terrible failure!"
+      end
     end
   end
 end

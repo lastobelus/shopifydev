@@ -13,8 +13,7 @@ class QuickUpload
   def credentials
     unless @credentials
       @credentials = YAML::load(
-        File.open(
-          File.join(File.dirname(__FILE__), '.shopifydev.yaml')))
+        File.open('.shopifydev.yaml'))
     end
 
     @credentials
@@ -22,11 +21,9 @@ class QuickUpload
 
 end
 
-if __FILE__ == $PROGRAM_NAME
-  test_shop = QuickUpload.new
+test_shop = QuickUpload.new
 
-  # upload a new asset by file name
-  puts ARGV[0]
-  test_shop.devshop.asset(ARGV[0]).upload
-end
+# upload a new asset by file name
+puts "uploading: " + ARGV[0]
+test_shop.devshop.asset(ARGV[0]).upload
 
