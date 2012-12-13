@@ -22,9 +22,9 @@ class QuickDownload
 
 end
 
-test_shop = QuickUpload.new
+test_shop = QuickDownload.new
+puts "downloading..."
+test_shop.devshop.template.download
 
-# upload a new asset by file name
-puts "uploading: " + ARGV[0]
-test_shop.devshop.asset(ARGV[0]).upload
+# test_shop.devshop.asset('assets/example.png').upload
 
