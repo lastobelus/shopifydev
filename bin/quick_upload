@@ -3,7 +3,7 @@
 require_relative "../lib/shopifydev.rb"
 require "shopify_api"
 
-class QuickDownload
+class QuickUpload
   attr_accessor :devshop
 
   def initialize
@@ -13,8 +13,7 @@ class QuickDownload
   def credentials
     unless @credentials
       @credentials = YAML::load(
-        File.open(
-          File.join(File.dirname(__FILE__), '.shopifydev.yaml')))
+        File.open('.shopifydev.yaml'))
     end
 
     @credentials
