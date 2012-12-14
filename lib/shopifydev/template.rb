@@ -4,10 +4,11 @@ require 'fileutils'
 module Shopifydev
   class Template
 
-    attr_accessor :shop
+    attr_accessor :shop, :project_root
 
-    def initialize(shop)
+    def initialize(shop, project_root)
       @shop = shop
+      @project_root = project_root
     end
 
     def download(root=nil)
@@ -32,11 +33,11 @@ module Shopifydev
 
     def write_local_copy(file)
 
-      folder_path = Pathname.new(tm_project_directory +
+      directory_path = Pathname.new(@project_root +
                                  File::Separator +
-                                 file.dirname.to_path).realdirpath
+                                 file.dirname.to_path)
 
-      FileUtils.mkpath(folder_path.to_path) unless (folder_path.exist?)
+      directory_path.mkpath unless (directory_path.exist?)
 
       begin
         puts "downloading #{file.basename}"
@@ -47,18 +48,11 @@ module Shopifydev
       end
 
       # TODO maybe this should compare timestamps?
-      File.open((folder_path + file.basename).to_path, 'w') do |f|
-        puts "writing #{file.basename}"
+      File.open((directory_path.realdirpath + file.basename).to_path, 'w') do |f|
+        puts "writing #{directory_path.to_path + File::Separator +  file.basename.to_path}"
         f.write(asset.value)
+        puts "---"
       end
-    end
-
-    def tm_project_directory
-      if ENV['TM_PROJECT_DIRECTORY'].nil?
-        raise 'TM_PROJECT_DIRECTORY: TextMate project directory is not set.'
-      end
-
-      ENV['TM_PROJECT_DIRECTORY']
     end
 
     def get_list_of_assets(response)

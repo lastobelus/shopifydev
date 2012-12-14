@@ -27,7 +27,7 @@ module Shopifydev
     end
 
     def template
-      @template ||= Template.new(self)
+      @template ||= Template.new(self, project_root)
     end
 
     def asset(path)

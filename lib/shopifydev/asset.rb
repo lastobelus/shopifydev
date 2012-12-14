@@ -8,9 +8,6 @@ module Shopifydev
     def initialize(shop, path=ENV['TM_FILEPATH'], project_root)
       @shop = shop
 
-      puts "path " + path.to_s
-      puts "project_root " + project_root.to_s
-
       # Asset name should be relative to TM_PROJECT_DIRECTORY
       # but if it isn't, then gsub just doesn't replace anything
       # so if you know the key, you can just supply the key?
@@ -25,8 +22,12 @@ module Shopifydev
     def upload(root=nil)
       # check that it's not binary 
 
+      puts "creating asset for " + @remote_key
       asset = ShopifyAPI::Asset.create(:key => @remote_key)
+
+      puts "filling with 1's and 0's from " + @local_path.to_path
       contents = File.read(@local_path.to_path)
+
       fm = FileMagic.new
 
       if (fm.file(@local_path.realpath.to_path).include?('image'))
@@ -37,12 +38,14 @@ module Shopifydev
 
       # TODO this doesn't fail spectacularly enough... I don't 
       # feel comfortable with that
+      puts "saving..."
       if asset.valid?
         asset.save
         puts "Success!"
       else
         puts "Failure! Terrible failure!"
       end
+      puts "---"
     end
   end
 end
