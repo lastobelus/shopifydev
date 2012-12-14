@@ -3,7 +3,7 @@ require "shopify_api"
 
 module Shopifydev
   class Shop
-    attr_accessor :credentials, :logger
+    attr_accessor :credentials, :logger, :project_root
 
     def initialize(credentials)
       @credentials = credentials
@@ -16,12 +16,22 @@ module Shopifydev
       logger.debug("set shopify site to #{ShopifyAPI::Base.site}")
     end
 
+    def project_root
+      @project_root ||= begin
+                          if credentials['project_root_variable']
+                            ENV[credentials['project_root_variable']] || credentials['project_root']
+                          else
+                            credentials['project_root']
+                          end
+                        end
+    end
+
     def template
       @template ||= Template.new(self)
     end
 
-    def asset(name)
-      Asset.new(self, name)
+    def asset(path)
+      Asset.new(self, path, project_root)
     end
 
   end

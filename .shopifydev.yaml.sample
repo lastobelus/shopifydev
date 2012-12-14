@@ -3,3 +3,5 @@
 api_key: youneedakey
 password: andapassword
 url: my_store_url.myshopify.com/
+project_root: relative/path
+project_root_variable: SOME_ENVIRONMENT_VARIABLE

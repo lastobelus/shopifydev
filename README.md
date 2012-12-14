@@ -22,16 +22,13 @@ file should contain the secrets specific to the shopify site you are working on.
     api_key: youneedakey
     password: andapassword
     url: my_store_url.myshopify.com
+    project_root: relative/path (this might just be '.' for a lot of you cats)
+    project_root_variable: SOME_ENVIRONMENT_VARIABLE
 
-Don't include 'http://' in the url, and don't commit this file to your repo (because secrets).
-
-Once that's done there's just ONE MORE THING. You need to have an environment variable,
-
-    export TM_PROJECT_DIRECTORY='where_files_live'
-
-Later on we'll set this app up to use different variables depending on what text editor you are using
-but for now it is TM by default. If you have a couple of projects, you are going to get tired of 
-exporting variables all the time... so we'll fix this soon.
+Don't include 'http://' in the url, and don't commit this file to your repo (because secrets). The project
+root should be the directory where the 'assets' directory lives. If you would rather use an environment
+variable specific to your text editor of choice, like TM_PROJECT_DIRECTORY, you can supply that as well.
+Shopifydev will always prefer the environment variable, though.
 
 ## Usage
 
