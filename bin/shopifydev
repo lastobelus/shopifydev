@@ -45,10 +45,27 @@ desc 'Upload a particular file to shopify'
 arg_name 'remote key' # upload requires the remote key be specified here
 command :upload do |c|
 
+  desc 'Upload all files from the given directory'
+  default_value 'none'
+  arg_name 'patch_root'
+  flag [:p,:patchify]
+
   c.action do |global_options,options,args|
 
     remote_key = args[0]
-    Shopifydev::CommandRunner.new.upload(remote_key, options)
+
+    if options[:patchify]
+      runner = Shopifydev::CommandRunner.new
+      ENV['PATCHIFY_ROOT'] = options[:p] # temporarily set an environment variable
+
+      Dir.glob(File.join(ENV['PATCHIFY_ROOT'], "*/*")).reverse.each do |file|
+        runner.upload(file, options)
+      end
+
+    else
+
+      Shopifydev::CommandRunner.new.upload(remote_key, options)
+    end
 
     puts "upload command ran"
   end
