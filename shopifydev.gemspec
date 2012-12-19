@@ -19,6 +19,7 @@ Gem::Specification.new do |gem|
   
   gem.add_dependency "shopify_api", ">= 3.0.0"
   gem.add_dependency "ruby-filemagic", ">= 0.4.2"
+  gem.add_dependency "gli", ">= 2.5.2"
   
   gem.add_development_dependency "rake"
 end
