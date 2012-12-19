@@ -30,8 +30,12 @@ root should be the directory where the 'assets' directory lives. If you would ra
 variable specific to your text editor of choice, like TM_PROJECT_DIRECTORY, you can supply that as well.
 Shopifydev will always prefer the environment variable, though.
 
-## Usage
+## TODO
 
+Currently we haven't implemented uploading layouts or the files in the config directoyr, like the
+settings data.
+
+## Usage
 
 ## Contributing
 
