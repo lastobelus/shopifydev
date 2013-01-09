@@ -1,0 +1,29 @@
+#! /usr/bin/env ruby
+
+require_relative "../lib/shopifydev.rb"
+require "shopify_api"
+
+class QuickUpload
+  attr_accessor :devshop
+
+  def initialize
+    @devshop = Shopifydev::Shop.new(credentials)
+  end
+
+  def credentials
+    unless @credentials
+      @credentials = YAML::load(
+        File.open('.shopifydev.yaml'))
+    end
+
+    @credentials
+  end
+
+end
+
+test_shop = QuickUpload.new
+
+# upload a new asset by file name
+puts "uploading: " + ARGV[0]
+test_shop.devshop.asset(ARGV[0]).upload
+
