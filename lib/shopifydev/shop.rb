@@ -17,9 +17,9 @@ module Shopifydev
     end
 
     def project_root
-      @project_root ||= begin
+      @project_root ||= ENV['PATCHIFY_ROOT'] || begin
                           if credentials['project_root_variable']
-                            ENV[credentials['project_root_variable']] || credentials['project_root']
+                              ENV[credentials['project_root_variable']] || credentials['project_root']
                           else
                             credentials['project_root']
                           end
