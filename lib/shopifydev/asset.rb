@@ -6,6 +6,7 @@ module Shopifydev
     attr_accessor :shop, :remote_key
 
     def initialize(shop, path=ENV['TM_FILEPATH'], project_root)
+      puts "in asset::initialize"
       @shop = shop
 
       # Asset name should be relative to TM_PROJECT_DIRECTORY
@@ -21,9 +22,11 @@ module Shopifydev
 
     def upload(root=nil)
       # check that it's not binary 
+      puts "in upload"
 
       puts "creating asset for " + @remote_key
-      asset = ShopifyAPI::Asset.create(:key => @remote_key)
+      puts @remote_key
+      asset = ShopifyAPI::Asset.new(:key => @remote_key)
 
       puts "filling with 1's and 0's from " + @local_path.to_path
       contents = File.read(@local_path.to_path)
