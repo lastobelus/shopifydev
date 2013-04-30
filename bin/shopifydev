@@ -50,6 +50,7 @@ command :upload do |c|
 
     case mode
       when 'patchify'
+        puts mode
         # we need one patch dir and no args
         raise "patchify takes no args" if args.length > 0
 

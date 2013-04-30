@@ -31,10 +31,14 @@ module Shopifydev
   end
 
   def patchify(patch_dir)
+    puts "in"
+    puts patch_dir
+
     ENV['PATCHIFY_ROOT'] = patch_dir # temporarily set an environment variable
 
     Dir.glob(File.join(ENV['PATCHIFY_ROOT'], "*/*")).reverse.each do |file|
-      self.upload(file)
+
+      self.upload(Array.wrap(File.join(file.split('/')[-2..-1])))
     end
   end
 
