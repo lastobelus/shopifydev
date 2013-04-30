@@ -31,8 +31,6 @@ module Shopifydev
   end
 
   def patchify(patch_dir)
-    puts "in"
-    puts patch_dir
 
     ENV['PATCHIFY_ROOT'] = patch_dir # temporarily set an environment variable
 
@@ -52,7 +50,6 @@ module Shopifydev
 
   def upload_glob(glob)
     # upload all assets in the given dir matching a given pattern
-    puts "in"
 
     glob.each do |remote_key|
       self.upload(remote_key)
