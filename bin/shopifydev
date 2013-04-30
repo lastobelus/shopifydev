@@ -42,17 +42,7 @@ command :upload do |c|
   c.arg_name 'patch_root'
   c.flag [:p, :patchify]
 
-  c.desc 'Upload all files matching a glob'
-  c.default_value 'none'
-  c.arg_name 'glob'
-  c.flag [:g, :globify]
-
   c.action do |global_options,options,args|
-
-    # patchify and glob are mutex locked
-    if options[:patchify] != 'none' && options[:globify] != 'none' then
-      raise "patchify and globify are mutually exclusive!"
-    end
 
     mode = (options[:patchify] != 'none') ? 'patchify' : ''
 
