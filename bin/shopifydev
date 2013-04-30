@@ -11,17 +11,9 @@ end
 
 include GLI::App
 
-program_desc "Backup and restore Firefox's sessionstore, so that you can recover your tab groups (panoramas) after a crash."
+program_desc "Upload shopify files from the command-line like a boss."
 
 version Shopifydev::VERSION
-
-desc 'Describe some switch here'
-switch [:s,:switch]
-
-desc 'Describe some flag here'
-default_value 'the default'
-arg_name 'The name of the argument'
-flag [:f,:flagname]
 
 desc 'verbose'
 switch [:v, :verbose]
@@ -45,26 +37,35 @@ desc 'Upload a particular file to shopify'
 arg_name 'remote key' # upload requires the remote key be specified here
 command :upload do |c|
 
-  desc 'Upload all files from the given directory'
-  default_value 'none'
-  arg_name 'patch_root'
-  flag [:p,:patchify]
+  c.desc 'Upload all files from a given root'
+  c.default_value 'none'
+  c.arg_name 'patch_root'
+  c.flag [:p, :patchify]
+
+  c.desc 'Upload all files matching a glob'
+  c.default_value 'none'
+  c.arg_name 'glob'
+  c.flag [:g, :globify]
 
   c.action do |global_options,options,args|
 
-    remote_key = args[0]
+    # patchify and glob are mutex locked
+    if options[:patchify] != 'none' && options[:globify] != 'none' then
+      raise "patchify and globify are mutually exclusive!"
+    end
 
-    if options[:patchify]
-      runner = Shopifydev::CommandRunner.new
-      ENV['PATCHIFY_ROOT'] = options[:p] # temporarily set an environment variable
+    mode = (options[:patchify] != 'none') ? 'patchify' : ''
 
-      Dir.glob(File.join(ENV['PATCHIFY_ROOT'], "*/*")).reverse.each do |file|
-        runner.upload(file, options)
-      end
+    runner = Shopifydev::CommandRunner.new
 
-    else
+    case mode
+      when 'patchify'
+        # we need one patch dir and no args
+        raise "patchify takes no args" if args.length > 0
 
-      Shopifydev::CommandRunner.new.upload(remote_key, options)
+        runner.patchify(options[:p])
+      else
+        Shopifydev::CommandRunner.new.upload(args, options)
     end
 
     puts "upload command ran"
