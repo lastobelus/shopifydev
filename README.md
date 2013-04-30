@@ -30,12 +30,36 @@ root should be the directory where the 'assets' directory lives. If you would ra
 variable specific to your text editor of choice, like TM_PROJECT_DIRECTORY, you can supply that as well.
 Shopifydev will always prefer the environment variable, though.
 
-## TODO
-
-Currently we haven't implemented uploading layouts or the files in the config directoyr, like the
-settings data.
-
 ## Usage
+
+WARNING: Files will always be uploaded from `project_root/`. This is great, because it means you can keep 
+the shopify files separate from whatever sweet app you happen to be working on. Unfortunately, at the 
+moment, this means autocompletion of file names really only works if `project_root` is `'.'`. But Imma fix 
+that.
+
+With shopifydev uploading a shopify file is a snap!
+
+    $ shopifydev upload assets/some_pic.jpg
+
+Uploading two files is also a snap!
+
+    $ shopifydev upload assets/cart.png templates/cart.liquid 
+
+More files? It's a UNIX system! You know this!
+
+    $ shopifydev upload {snippets,templates}/*.liquid
+
+But Mr Authors, what if I don't have any files to upload?
+
+    $ shopify download
+
+What could be better than that? How about uploading all your files:
+
+    $ shopifydev upload --patchify patch_directory
+
+I wouldn't recommend running that with '.' or any directory that contains subdirectories shopify wouldn't recognize. I'll fix that someday too! (^o ^)//
+
+One final tip: `alias upify='shopifydev upload'`
 
 ## Contributing
 
