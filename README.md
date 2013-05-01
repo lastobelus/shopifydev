@@ -57,7 +57,14 @@ What could be better than that? How about uploading all your files:
 
     $ shopifydev upload --patchify patch_directory
 
-I wouldn't recommend running that with '.' or any directory that contains subdirectories shopify wouldn't recognize. I'll fix that someday too! (^o ^)//
+(I wouldn't recommend running that with '.' or any directory that contains subdirectories shopify wouldn't recognize. I'll fix that someday too! (^o ^)//)
+
+Oh, you don't want to upload all your files, and you're too lazy to glob?
+Use `--gitify` to upload all the shopify files with changes.
+
+    $ shopifydev upload --gitify
+
+(this uses the output of `git status --porcelain`)
 
 One final tip: `alias upify='shopifydev upload'`
 
