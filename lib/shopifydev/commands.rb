@@ -50,6 +50,10 @@ module Shopifydev
       not ["assets", "snippets", "templates", "layout"].include?(file.split('/')[0].strip)
     end
 
+    remote_keys.each do |file|
+      `git add #{file}`
+    end
+
     upload(remote_keys)
   end
 
