@@ -18,8 +18,9 @@ module Shopifydev
     @credentials
   end
 
-  def upload(remote_keys, options={})
+  def upload(remote_keys)
     # upload one asset or directory
+    raise "no shopify files were specified" if remote_keys.empty?
 
     remote_keys.each do |remote_key|
       if File.directory?(remote_key) then
@@ -38,6 +39,18 @@ module Shopifydev
 
       self.upload(Array.wrap(File.join(file.split('/')[-2..-1])))
     end
+  end
+
+  def gitify
+    porcelain = `git status --porcelain`
+
+    modified = porcelain.scan(/^ M(.*)/).flatten.each {|f| f.strip!}
+
+    remote_keys = modified.delete_if do |file|
+      not ["assets", "snippets", "templates", "layout"].include?(file.split('/')[0].strip)
+    end
+
+    upload(remote_keys)
   end
 
   def upload_dir(upload_dir)

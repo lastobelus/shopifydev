@@ -42,21 +42,34 @@ command :upload do |c|
   c.arg_name 'patch_root'
   c.flag [:p, :patchify]
 
-  c.action do |global_options,options,args|
+  c.desc 'Upload all files with changes in git'
+  c.default_value 'none'
+  c.switch [:g, :gitify]
 
-    mode = (options[:patchify] != 'none') ? 'patchify' : ''
+  c.action do |global_options,options,args|
+    gitify = options[:gitify] != 'none'
+    patchify = options[:patchify] != 'none'
+    raise "gitify and patchify are mutually exclusive" if gitify && patchify
+
+    mode = (patchify) ? 'patchify' : ''
+    mode = (gitify) ? 'gitify' : '' if mode.blank?
 
     runner = Shopifydev::CommandRunner.new
 
     case mode
       when 'patchify'
         puts mode
-        # we need one patch dir and no args
         raise "patchify takes no args" if args.length > 0
 
         runner.patchify(options[:p])
+      when 'gitify'
+        puts mode
+        raise "patchify takes no args" if args.length > 0
+
+        runner.gitify
       else
-        Shopifydev::CommandRunner.new.upload(args, options)
+        puts mode
+        runner.upload(args)
     end
 
     puts "upload command ran"
