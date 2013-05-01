@@ -44,7 +44,7 @@ module Shopifydev
   def gitify
     porcelain = `git status --porcelain`
 
-    modified = porcelain.scan(/^ M(.*)/).flatten.each {|f| f.strip!}
+    modified = porcelain.scan(/^[ M]M(.*)/).flatten.each {|f| f.strip!}
 
     remote_keys = modified.delete_if do |file|
       not ["assets", "snippets", "templates", "layout"].include?(file.split('/')[0].strip)
