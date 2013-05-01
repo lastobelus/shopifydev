@@ -64,7 +64,8 @@ Use `--gitify` to upload all the shopify files with changes.
 
     $ shopifydev upload --gitify
 
-(this uses the output of `git status --porcelain`)
+(this uses the output of `git status --porcelain`, and it also runs `git add` on all those files so that
+you won't upload a file twice unless it gets changed twice in the same commit)
 
 One final tip: `alias upify='shopifydev upload'`
 
