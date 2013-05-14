@@ -44,10 +44,13 @@ module Shopifydev
       # feel comfortable with that
       puts "saving..."
       if asset.valid?
-        asset.save
-        puts "Success!"
+        if asset.save
+          puts "Success!"
+        else
+          puts "failed to save"
+        end
       else
-        puts "Failure! Terrible failure!"
+        puts "failed to validate"
       end
       puts "---"
     end
