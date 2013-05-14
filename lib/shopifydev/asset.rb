@@ -29,6 +29,7 @@ module Shopifydev
       asset = ShopifyAPI::Asset.new(:key => @remote_key)
 
       puts "filling with 1's and 0's from " + @local_path.to_path
+
       contents = File.read(@local_path.to_path)
 
       fm = FileMagic.new
