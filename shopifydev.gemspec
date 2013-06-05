@@ -26,5 +26,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'dalli'
   gem.add_dependency 'shydra'
   gem.add_dependency 'pry'
+  
   gem.add_development_dependency "rake"
 end

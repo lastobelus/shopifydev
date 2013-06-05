@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'pry'
-
+require 'shopifydev'
+require 'shopifydev/pry/commands'
 
 
 # start a REPL session
