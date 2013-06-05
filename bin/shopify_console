@@ -4,6 +4,11 @@ require 'shopifydev'
 require 'shopifydev/pry/commands'
 
 
+MY_OBJ = []
+
+def bob
+  "yo, bob here"
+end
 # start a REPL session
 binding.pry
 

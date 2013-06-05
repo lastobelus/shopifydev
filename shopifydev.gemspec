@@ -26,6 +26,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'dalli'
   gem.add_dependency 'shydra'
   gem.add_dependency 'pry'
-  
+  gem.add_dependency 'activesupport'
+  gem.add_dependency 'term-ansicolor'
+
   gem.add_development_dependency "rake"
 end

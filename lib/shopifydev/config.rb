@@ -1,13 +1,9 @@
+require 'active_support/core_ext/hash'
+
 module Shopifydev
   module Config
-    def self.load
-      YAML::load(File.open(File.expand_path('~/.shopifydev.yaml')))
-    end
-
     def self.config
-      @config ||= load
+      YAML::load(File.open(File.expand_path('~/.shopifydev.yaml'))).with_indifferent_access
     end
-
-    
   end
 end
