@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+require 'pry'
+
+
+
+# start a REPL session
+binding.pry
+
+puts "Thank you for using Shopify Console. Enjoy your day."
