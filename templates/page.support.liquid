@@ -1,0 +1,78 @@
+
+
+
+
+<div id="page" class="clearfix">
+
+  <div id="header">
+    <div class="wrapper">
+      <p><h1>{{ page.title }}</h1></p>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="wrapper">
+
+      <div id="contact-menu">
+        {% for link in linklists['footer-support'].links %}
+        {% if link.title == page.title %}
+        <p><a href="{{ link.url }}" id="active"><h4>{{ link.title }}</h4></a></p>
+        {% else %}
+        <p><a href="{{ link.url }}"><h4>{{ link.title }}</h4></a></p>
+        {% endif %}
+        {% endfor %}
+      </div>
+
+      <div id="contact-form">
+
+        {% if page.title == "Contact" %}
+
+          {% form 'contact' %}
+
+          {% if form.posted_successfully? %}
+          Thanks for contacting us! We'll get back to you as soon as possible.
+          {% endif %}
+
+          {% if form.errors %}
+          {% for field in form.errors %}
+          <div>
+            <p id="error_message">{{ field }} - {{ form.errors.messages[field] }}</p>
+          </div>
+          {% endfor %}
+          {% endif %}
+
+          <div id="getintouch" style="float:left">
+            <h3>Get In Touch</h3>
+            <hr>
+            <small>* indicates a required field</small><br>
+            <input type="text" value="Full Name" name="contact[name]"> <br>
+            <input type="text" value="Email Address" name="contact[email]"> <span class="required">&nbsp;*</span> <br>
+            <textarea cols="38" rows="5" type="text" name="contact[message]">your message</textarea>
+            <input type="image" src="{{ 'getintouch.png' | asset_url }}" class="submit">
+          </div>
+          {% endform %}
+
+
+          <div id="contact-info">
+            <h3>Visit Our Store</h3>
+            <hr>
+            <p>Suite A - 123 Something Street <br>
+            Vancouver, BC Postal Code <br>
+            Canada</p>
+          </div>
+
+          <div id="contact-info">
+            <h3>Customer Support</h3>
+            <hr>
+            <p>(800)123-1234 <br>
+            support@elroy.com</p>
+          </div>
+        {% else %}
+          {{ page.content }}
+        {% endif %}
+
+      </div>
+
+    </div>
+  </div>
+</div> <!-- /#page -->
