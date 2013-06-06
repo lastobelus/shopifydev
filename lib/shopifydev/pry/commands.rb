@@ -1,4 +1,5 @@
 require 'term/ansicolor'
+require 'oj'
 class Color
   if Pry.config.color
     extend Term::ANSIColor
@@ -9,6 +10,20 @@ class Color
       end
     end
   end
+end
+
+class LocalShopifyApp
+  attr_accessor :path
+  def initialize(path)
+    @path = path
+  end
+
+  def shops
+    json = `/bin/bash -l -c "unset BUNDLE_GEMFILE; cd #{path}; bundle exec rake shops 2>/dev/null"`
+    json = json.split("----snip----\n").last
+    Oj.load json
+  end
+
 end
 
 class ConfigMenu
@@ -121,10 +136,12 @@ shopifydev_command_set = Pry::CommandSet.new do
         when :development
           output.puts "you picked #{path.join('.')}"
           output.puts cfg.inspect
-          output.puts Color.yellow{ "but it's not ready yet!"}          
+          app = LocalShopifyApp.new(cfg)
+          output.puts Color.yellow{ app.shops.inspect }          
         when :heroku
           output.puts "you picked #{path.join('.')}"
           output.puts cfg.inspect
+
           output.puts Color.yellow{ "but it's not ready yet!"}          
         else
           output.puts "you picked #{path.join('.')}"
