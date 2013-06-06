@@ -20,10 +20,12 @@ apps (heroku):
 1. metafieldseditor
 2. shipping
 
-pry-shopify
-  Switch is an object defined in the global scope, that refers to Pry.switch
-  there is a command, called switch which presents a menu and accepts numerical argument
-  it is a command-wrapper of Pry.Switch
+_pry_.switch
+  Switch is a class, and every instance of Pry has an instance of Switch. This way we can
+  access _pry_.switch. In the global scope there will be an object called 'switch' that will
+  be an alias to _pry_.switch so that we can call its public methods. There will also be a 
+  command 'switch' that will be a wrapper for the _pry_.switch methods for displaying and
+  handling a menu.
 
   So we can do
 
@@ -37,16 +39,47 @@ pry-shopify
 
   Or we can use tab completion to present the menu by invoking switch as a global object.
 
-  ```
+````
   [1] pry(main)> switch.m[TAB]
   switch.metafieldseditor switch.morfars-metafields
   [2] pry(main)> switch.mo[TAB]rfars-metafields
-  ```
+````
 
   to accomplish the same.
 
-when you choose 
+   - When you use switch by itself, with no args, then _pry_.switch gets reset to the first menu
+   - each time you make a choice, this advances _pry_.switch to the next menu
 
+  So in a deep menu we might see:
+
+````
+  [1] pry(main)> switch
+  current shop: none
+
+  Heroku Apps
+  1. right app
+  2. wrong app
+  [1] pry(main)> switch 2
+  current shop: none
+
+  Wrong App
+  1. not ok
+  2. something
+  [1] pry(main)> switch
+  current shop: none
+
+  Heroku Apps
+  1. right app
+  2. wrong app
+  [1] pry(main)> switch 1
+  current shop: none
+
+  Wrong App
+  1. another thing
+  2. the thing you wanted
+  [1] pry(main)> switch 2
+  current shop: none switching to "the thing you wanted"...
+````
 
 # To check out
 
