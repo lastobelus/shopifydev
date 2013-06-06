@@ -29,5 +29,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'activesupport'
   gem.add_dependency 'term-ansicolor'
 
+  # for generators
+  gem.add_dependency 'railties'
   gem.add_development_dependency "rake"
 end
