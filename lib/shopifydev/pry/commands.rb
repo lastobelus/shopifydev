@@ -19,15 +19,14 @@ class LocalShopifyApp
   end
 
   def shops
-    json = `/bin/bash -l -c "unset BUNDLE_GEMFILE; cd #{path}; bundle exec rake shops 2>/dev/null"`
+    json = `/bin/bash -l -c "unset BUNDLE_GEMFILE; cd #{path} 2> /dev/null; bundle exec rake shops 2>/dev/null"`
     json = json.split("----snip----\n").last
+    json = json.split("\n").last
     Oj.load json
   end
-
 end
 
 class ConfigMenu
-
   attr_accessor :cfg
 
   def initialize(cfg)
@@ -35,6 +34,7 @@ class ConfigMenu
     @menu_choices = [:do_nothing]
     @menu_display = []
   end
+
   def build
     header("Test Shops")
     cfg[:test_shops].keys.each do |k|
@@ -103,8 +103,6 @@ shopifydev_command_set = Pry::CommandSet.new do
 
       config_menu = ConfigMenu.new(Shopifydev::Config.config).build
 
-      
-
       case true
       when args.empty?
         config_menu.print(output)
@@ -137,7 +135,7 @@ shopifydev_command_set = Pry::CommandSet.new do
           output.puts "you picked #{path.join('.')}"
           output.puts cfg.inspect
           app = LocalShopifyApp.new(cfg)
-          output.puts Color.yellow{ app.shops.inspect }          
+          output.puts Color.yellow{ app.shops.inspect }
         when :heroku
           output.puts "you picked #{path.join('.')}"
           output.puts cfg.inspect
@@ -188,7 +186,6 @@ shopifydev_command_set = Pry::CommandSet.new do
       ix += output_menu_choices(cfg[:apps][:heroku].keys.sort, ix)
     end
   end
-
 end
 
 Pry::Commands.import shopifydev_command_set

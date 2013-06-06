@@ -20,7 +20,30 @@ apps (heroku):
 1. metafieldseditor
 2. shipping
 
+pry-shopify
+  Switch is an object defined in the global scope, that refers to Pry.switch
+  there is a command, called switch which presents a menu and accepts numerical argument
+  it is a command-wrapper of Pry.Switch
 
+  So we can do
+
+  `[1] pry(main)> switch`
+
+  to present a menu of options and then
+
+  `[1] pry(main)> switch 3`
+
+  to choose one of them. This command just refers to methods on Pry.Switch in its process definition
+
+  Or we can use tab completion to present the menu by invoking switch as a global object.
+
+  ```
+  [1] pry(main)> switch.m[TAB]
+  switch.metafieldseditor switch.morfars-metafields
+  [2] pry(main)> switch.mo[TAB]rfars-metafields
+  ```
+
+  to accomplish the same.
 
 when you choose 
 
