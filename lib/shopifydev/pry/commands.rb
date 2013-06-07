@@ -275,12 +275,28 @@ shopifydev_command_set = Pry::CommandSet.new do
       when args.empty?
         _pry_.switch.reset # reset to the first menu page
         output.puts _pry_.switch.menu.print
+        choice = $stdin.gets
+        puts "you chose #{choice}"
       when (args.length == 1)
         ix = args.first.to_i
         output.puts _pry_.switch.pick(ix)
       end
     end
   end
+
+  create_command "arlog", "Turn ActiveResource logging on/off" do
+    def process
+      case  args.first
+      when 'off'
+        puts Color.black{"ActiveResource logging "} + Color.red{'off'}
+        ActiveResource::Base.logger = nil
+      else      
+        puts Color.black{"ActiveResource logging "} + Color.yellow{'on'}
+        ActiveResource::Base.logger = Logger.new STDOUT
+      end
+    end
+end
+
 end
 
 Pry::Commands.import shopifydev_command_set

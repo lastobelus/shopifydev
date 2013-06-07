@@ -13,3 +13,5 @@ class Color
     end
   end
 end
+
+Pry.config.hooks.add_hook(:before_session, :set_context) { |_, _, pry| pry.input = StringIO.new("cd ShopifyAPI") }
