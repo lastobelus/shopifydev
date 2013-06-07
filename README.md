@@ -84,7 +84,7 @@ Assuming you ```cd ShopifyAPI```:
         => reload products cache with params {product_type: 'xxxx'}
         
         products.params
-        => shows params the caches were loaded with
+        => shows params the caches were fetched with
         
         products.since
         => shows when the products cache was last fetched
