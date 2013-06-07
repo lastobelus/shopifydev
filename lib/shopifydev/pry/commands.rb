@@ -1,11 +1,9 @@
 require 'oj'
 
 class Switch
-
   def initialize
     @current_shop = ''
     @menu = default_menu
-
   end
 
   def current_shop
@@ -24,9 +22,9 @@ class Switch
   def pick(ix)
     result = ''
 
-    @path, @cfg = pick_config(ix)
+    @breadcrumbs, @cfg = pick_config(ix)
 
-    if @path == :no_such_config
+    if @breadcrumbs == :no_such_config
       result << Color.red{ "I don't know about #{ix}\n" }
       result << self.menu.print
     else
@@ -66,7 +64,7 @@ class Switch
 
     case @cfg.class.to_s
     when "String" then
-      case @path[1].to_sym
+      case @breadcrumbs[1].to_sym
       when :development then menu_method = self.method(:development_menu)
       when :heroku      then menu_method = self.method(:heroku_menu)
       else                   menu_method = self.method(:missing_menu)
@@ -75,7 +73,7 @@ class Switch
     end
 
     if menu_method
-      result << "you picked #{@path.join('.')}\n"
+      result << "you picked #{@breadcrumbs.join('.')}\n"
       result << @cfg.inspect + "\n"
       result << Color.yellow { menu_method.call.print }
     end
@@ -135,7 +133,6 @@ class Switch
   def missing_menu
     @menu = ConfigMenu.new(shops, :missing).build
   end
-
 end
 
 class Pry
