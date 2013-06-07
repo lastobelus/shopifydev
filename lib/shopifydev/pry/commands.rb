@@ -289,9 +289,9 @@ shopifydev_command_set = Pry::CommandSet.new do
       when args.empty?
         _pry_.switch.reset # reset to the first menu page
         output.puts _pry_.switch.menu.print
-        print "ima ask for input:"
-        choice = $stdin.gets
-        puts "you chose #{choice}"
+        # print "ima ask for input:"
+        # choice = $stdin.gets
+        # puts "you chose #{choice}"
       when (args.length == 1)
         ix = args.first.to_i
         output.puts _pry_.switch.pick(ix)
@@ -313,11 +313,7 @@ shopifydev_command_set = Pry::CommandSet.new do
   end
 
   block_command "tree", "display directory using unix 'tree'" do |path|
-    dir ||= Pathname.getwd
-    dir = Pathname.new(dir) unless dir.is_a?(Pathname)
-    puts Color.blue{ "listing #{dir}..."}
-    puts `cd #{dir.expand_path.to_s}; tree`.gsub(%r{(^[^\w]+)}, Color.black{'\1'})
-
+   UnixTree.print_tree(path) # moved to module so can use in save_json & load_json
   end
 
 end
