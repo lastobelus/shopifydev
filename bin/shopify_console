@@ -1,15 +1,8 @@
 #!/usr/bin/env ruby
 require 'pry'
 require 'shopifydev'
-require 'shopifydev/pry/commands'
+require 'shopifydev/console'
 
-
-MY_OBJ = []
-
-def bob
-  "yo, bob here"
-end
-# start a REPL session
-binding.pry
+Pry.start
 
 puts "Thank you for using Shopify Console. Enjoy your day."

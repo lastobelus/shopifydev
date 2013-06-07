@@ -1,16 +1,4 @@
-require 'term/ansicolor'
 require 'oj'
-class Color
-  if Pry.config.color
-    extend Term::ANSIColor
-  else
-    class << self
-      def method_missing
-        ''
-      end
-    end
-  end
-end
 
 class LocalShopifyApp
   attr_accessor :path
