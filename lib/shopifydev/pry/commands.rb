@@ -1,4 +1,3 @@
-require 'term/ansicolor'
 require 'oj'
 
 class Switch
@@ -144,18 +143,6 @@ class Pry
 
   def switch
     @switch ||= Switch.new
-  end
-end
-
-class Color
-  if Pry.config.color
-    extend Term::ANSIColor
-  else
-    class << self
-      def method_missing
-        ''
-      end
-    end
   end
 end
 

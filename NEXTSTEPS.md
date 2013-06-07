@@ -99,3 +99,9 @@ https://github.com/cldwalker/bond
   - [ ] red-pepper-shipping           richard@webifytechnology.com
   - [ ] shipping-lifemap-bioreagents  richard@webifytechnology.com
   - [ ] shipping-staging              richard@webifytechnology.com
+
+
+# Using pry features
+https://github.com/ConradIrwin/pry-rescue
+-- we **really** want to be using this in test/development environments in rails apps. 
+https://github.com/envygeeks/pry-vterm_aliases

@@ -69,6 +69,37 @@ you won't upload a file twice unless it gets changed twice in the same commit)
 
 One final tip: `alias upify='shopifydev upload'`
 
+# Caches
+
+Caches are defined on ```ShopifyAPI```.
+Assuming you ```cd ShopifyAPI```:
+
+        products
+        => lazily fetched cached products
+        
+        products.r
+        => reload products cache
+        
+        products(product_type: 'xxxx')
+        => reload products cache with params {product_type: 'xxxx'}
+        
+        products.params
+        => shows params the caches were fetched with
+        
+        products.since
+        => shows when the products cache was last fetched
+        
+        caches
+        => lists status of all the caches & when they were last
+           reloaded. Will show an ! next to records that were fetched
+           with params.
+        
+        caches true
+        => shows params the caches were loaded with
+        
+
+
+
 ## Contributing
 
 1. Fork it
