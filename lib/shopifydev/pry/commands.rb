@@ -99,6 +99,7 @@ class Switch
     if @cfg.keys.include?("shop_type")
       case @cfg["shop_type"].to_sym
       when :local
+        ShopifyAPI::Base.clear_session
         session = ShopifyAPI::Session.new(@cfg['url'], @cfg['token'])
         session.valid?  # returns true
         ShopifyAPI::Base.activate_session(session)
@@ -106,6 +107,7 @@ class Switch
         puts Color.red{ "can't handle heroku yet"}
       end
     else
+      ShopifyAPI::Base.clear_session
       set_shop(@cfg[:api_key], @cfg[:password], @cfg[:myshopify_domain])
     end
     self.current_shop
