@@ -1,11 +1,9 @@
 require 'oj'
 
 class Switch
-
   def initialize
     @current_shop = ''
     @menu = default_menu
-
   end
 
   def current_shop
@@ -24,9 +22,10 @@ class Switch
   def pick(ix)
     result = ''
 
-    @path, @cfg = pick_config(ix)
+    # TODO we need need need to rename cfg, as it is currently confusing
+    @breadcrumbs, @cfg = pick_config(ix)
 
-    if @path == :no_such_config
+    if @breadcrumbs == :no_such_config
       result << Color.red{ "I don't know about #{ix}\n" }
       result << self.menu.print
     else
@@ -66,7 +65,7 @@ class Switch
 
     case @cfg.class.to_s
     when "String" then
-      case @path[1].to_sym
+      case @breadcrumbs[1].to_sym
       when :development then menu_method = self.method(:development_menu)
       when :heroku      then menu_method = self.method(:heroku_menu)
       else                   menu_method = self.method(:missing_menu)
@@ -75,7 +74,7 @@ class Switch
     end
 
     if menu_method
-      result << "you picked #{@path.join('.')}\n"
+      result << "you picked #{@breadcrumbs.join('.')}\n"
       result << @cfg.inspect + "\n"
       result << Color.yellow { menu_method.call.print }
     end
@@ -101,20 +100,31 @@ class Switch
     @menu = ConfigMenu.new(Shopifydev::Config.config, :default).build
   end
 
+  # TODO this needs to be renamed:
+  #   It is the contents of .shopifydev.yaml, but it is also
+  #   more than that, since it gets updated throughout the life
+  #   of a switch object.
   def shopify_config
     @shopify_config ||= Shopifydev::Config.config
   end
 
+  # TODO this method is pretty obscure
   def development_menu
+    # this needs to be memoized
     app = LocalShopifyApp.new(@cfg)
     shops = app.shops
-    key = ''
 
+    # add the shop_type to the array of shops
     shops.each do |shop|
       shop["shop_type"] = "local"
     end
 
-    domain = @cfg
+    key = ''
+    domain = @cfg # at this point we know @cfg is a path on the local machine
+
+    # iterate over shopifydev.yaml and replace the local file path matching
+    # domain with the list of shops associated with that domain
+    # TODO drop M's terrible habbit of using k and v for key and value
     shopify_config["apps"]["development"].each do |k, v|
       if v == domain
         shopify_config["apps"]["development"][k] = shops
@@ -123,6 +133,7 @@ class Switch
       end
     end
 
+    # the menu relevant yaml needs to be [key, array]
     @menu = ConfigMenu.new([key, shopify_config["apps"]["development"][key]], :development).build
   end
 
@@ -135,7 +146,6 @@ class Switch
   def missing_menu
     @menu = ConfigMenu.new(shops, :missing).build
   end
-
 end
 
 class Pry
@@ -208,6 +218,8 @@ class ConfigMenu
 
   private
 
+  # instead of having infinite build_something methods, maybe we should have
+  # a way of passing in blocks, or something?
   def build_default
     header("Test Shops")
     json[:test_shops].keys.each do |k|
@@ -243,6 +255,7 @@ class ConfigMenu
     self
   end
 
+  # TODO I think these three related methods could be moved into a module called "Writer" or something
   def header(label)
     @lines << ''
     @lines << Color.blue { label }

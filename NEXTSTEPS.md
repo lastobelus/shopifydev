@@ -1,26 +1,45 @@
 # switch command
 
-should be some shortcuts
+Z(2013.06.06):
+  M, I think you should work on memoizing the shop array and the 'refresh'
+  command. That lag is killing me.
 
-switch cronin
+  You should take a look at switch.handle_choices and switch.handle_by_shop_type
+  I realized that the object we are calling @cfg is either:
+    a string, in which case we should keep going
+    a result object, in which case we should switch shops
 
-should look for shops in an app
+  So, in handle_choice we determine whether we present a new menu, or go
+  ahead and update the current shop
 
-switch with no arguments
-you get a list:
+  The result object gets a key "shop_type" that lets us know how to deal
+  with it. The behaviour for test_shop is already there, but if you could
+  implement the behaviour for local, I would be happy
 
-test shops:
-1. cronin
+  I wrote a bunch of comments around the commands.rb file, too, so feel free
+  to read those
 
-apps (development):
-1. metafieldseditor
-2. shipping
+M: should be some shortcuts
 
-apps (heroku):
-1. metafieldseditor
-2. shipping
+  switch cronin
 
-_pry_.switch
+  should look for shops in an app
+
+  switch with no arguments
+  you get a list:
+
+  test shops:
+  1. cronin
+
+  apps (development):
+  1. metafieldseditor
+  2. shipping
+
+  apps (heroku):
+  1. metafieldseditor
+  2. shipping
+
+Z: _pry_.switch
   Switch is a class, and every instance of Pry has an instance of Switch. This way we can
   access _pry_.switch. In the global scope there will be an object called 'switch' that will
   be an alias to _pry_.switch so that we can call its public methods. There will also be a 
@@ -39,11 +58,11 @@ _pry_.switch
 
   Or we can use tab completion to present the menu by invoking switch as a global object.
 
-````
+  ````
   [1] pry(main)> switch.m[TAB]
   switch.metafieldseditor switch.morfars-metafields
   [2] pry(main)> switch.mo[TAB]rfars-metafields
-````
+  ````
 
   to accomplish the same.
 
@@ -52,7 +71,7 @@ _pry_.switch
 
   So in a deep menu we might see:
 
-````
+  ````
   [1] pry(main)> switch
   current shop: none
 
@@ -79,7 +98,7 @@ _pry_.switch
   2. the thing you wanted
   [1] pry(main)> switch 2
   current shop: none switching to "the thing you wanted"...
-````
+  ````
 
 # To check out
 
@@ -89,8 +108,8 @@ https://github.com/cldwalker/bond
 
 # Menu of Shops in local apps
 - [x] run rake shops in chosen local app
-- [ ] display result of rake shops in a menu
-  - how do we handle this? do we use letters? or does switch command remember state (which menu was displayed last)? ie, what does ```switch 1``` mean? 
+- [x] display result of rake shops in a menu
+- [x] how do we handle this? do we use letters? or does switch command remember state (which menu was displayed last)? ie, what does ```switch 1``` mean? 
 - [ ] memoize results of rake shops in a hash with same keys as the apps have in config (I would put this in config). This is because running rake shops is slow enough to be annoying.
 - [ ] add -r,--refresh option to switch command to tell it to get fresh data
 - [ ] deploy apps with shopify_dev gem
