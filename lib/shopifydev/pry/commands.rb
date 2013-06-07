@@ -1,5 +1,152 @@
 require 'term/ansicolor'
 require 'oj'
+
+class Switch
+
+  def initialize
+    @current_shop = ''
+    @menu = default_menu
+
+  end
+
+  def current_shop
+    @current_shop = ShopifyAPI::Base.site || 'none'
+    Color.green{ "current shop:"} + " #{@current_shop}"
+  end
+
+  def reset
+    @menu = default_menu
+  end
+
+  def menu
+    @menu
+  end
+
+  def pick(ix)
+    result = ''
+
+    @path, @cfg = pick_config(ix)
+
+    if @path == :no_such_config
+      result << Color.red{ "I don't know about #{ix}\n" }
+      result << self.menu.print
+    else
+      # update the menu based on the choice
+      # if we've reached a terminal menu, then do something
+      # otherwise just present the next menu
+      result << handle_choice
+    end
+  end
+
+  private
+
+  def set_shop(key, password, domain)
+    @current_shop = domain
+    ShopifyAPI::Base.site = "https://#{key}:#{password}@#{domain}/admin/"
+    @current_shop
+  end
+
+  def pick_config(ix)
+    # this gives us the menu item
+    path = self.menu.pick(ix)
+    return :no_such_config if path.nil?
+    result = shopify_config
+
+    path.each do |x|
+      result = result[x]
+    end
+
+    [path, result]
+  end
+
+  # if we chose a test shop cfg is a hash of key, password, and domain
+  # if we chose a local shop, it is a path
+  # path is the path through the yaml file
+  def handle_choice
+    result = ''
+
+    case @cfg.class.to_s
+    when "String" then
+      case @path[1].to_sym
+      when :development then menu_method = self.method(:development_menu)
+      when :heroku      then menu_method = self.method(:heroku_menu)
+      else                   menu_method = self.method(:missing_menu)
+      end
+    else result = handle_by_shop_type
+    end
+
+    if menu_method
+      result << "you picked #{@path.join('.')}\n"
+      result << @cfg.inspect + "\n"
+      result << Color.yellow { menu_method.call.print }
+    end
+    result
+  end
+
+  def handle_by_shop_type
+    if @cfg.keys.include?("shop_type")
+      result =  case @cfg["shop_type"].to_sym
+                when :local then "local"
+                when :heroku then "heroku"
+                else "something else"
+                end
+    else
+      set_shop(@cfg[:api_key], @cfg[:password], @cfg[:myshopify_domain])
+      result = self.current_shop
+    end
+
+    result
+  end
+
+  def default_menu
+    @menu = ConfigMenu.new(Shopifydev::Config.config, :default).build
+  end
+
+  def shopify_config
+    @shopify_config ||= Shopifydev::Config.config
+  end
+
+  def development_menu
+    app = LocalShopifyApp.new(@cfg)
+    shops = app.shops
+    key = ''
+
+    shops.each do |shop|
+      shop["shop_type"] = "local"
+    end
+
+    domain = @cfg
+    shopify_config["apps"]["development"].each do |k, v|
+      if v == domain
+        shopify_config["apps"]["development"][k] = shops
+        key = k
+        break
+      end
+    end
+
+    @menu = ConfigMenu.new([key, shopify_config["apps"]["development"][key]], :development).build
+  end
+
+  def heroku_menu
+    app = HerokuShopifyApp.new(@cfg)
+    shops = app.shops
+    @menu = ConfigMenu.new(shops, :heroku).build
+  end
+
+  def missing_menu
+    @menu = ConfigMenu.new(shops, :missing).build
+  end
+
+end
+
+class Pry
+  attr_accessor :switch
+
+  def switch
+    @switch ||= Switch.new
+  end
+end
+
 class Color
   if Pry.config.color
     extend Term::ANSIColor
@@ -12,12 +159,23 @@ class Color
   end
 end
 
-class LocalShopifyApp
+# these mini classes JUST grabs the JSON that we need for making submenus
+class ShopifyAppShopList
   attr_accessor :path
+
   def initialize(path)
     @path = path
   end
 
+  def shops
+    raise "you must define the shops method"
+  end
+end
+
+class HerokuShopifyApp < ShopifyAppShopList
+end
+
+class LocalShopifyApp < ShopifyAppShopList
   def shops
     json = `/bin/bash -l -c "unset BUNDLE_GEMFILE; cd #{path} 2> /dev/null; bundle exec rake shops 2>/dev/null"`
     json = json.split("----snip----\n").last
@@ -27,65 +185,91 @@ class LocalShopifyApp
 end
 
 class ConfigMenu
-  attr_accessor :cfg
+  attr_accessor :json
 
-  def initialize(cfg)
-    @cfg = cfg
-    @menu_choices = [:do_nothing]
-    @menu_display = []
+  def initialize(json, style=:default)
+    @json = json
+    @style = style
+    @choices = [:do_nothing]
+    @lines = []
   end
 
   def build
+    case @style
+    when :development then build_development
+    when :default then build_default
+    when :heroku then build_heroku
+    else build_missing
+    end
+  end
+
+  def print(output=nil)
+    if output.nil?
+      @lines.join("\n")
+    else
+      output.puts @lines.join("\n")
+    end
+  end
+
+  def pick(ix)
+    if ix >= @choices.length
+      nil
+    else
+      @choices[ix]
+    end
+  end
+
+  private
+
+  def build_default
     header("Test Shops")
-    cfg[:test_shops].keys.each do |k|
+    json[:test_shops].keys.each do |k|
       choice([:test_shops, k], k)
     end
-    
+
     header("Local Apps")
-    cfg[:apps][:development].each do |k, path|
+    json[:apps][:development].each do |k, path|
       choice([:apps, :development, k], path)
     end
 
     header("Heroku Apps")
-    cfg[:apps][:heroku].each do |k, name|
+    json[:apps][:heroku].each do |k, name|
       choice([:apps, :heroku, k], name)
     end
 
     self
   end
 
-  def print(output)
-    output.puts @menu_display.join("\n")
+  def build_development
+    header("Development Shops")
+
+    name = json.first
+    json.last.each_with_index do |h, index|
+      choice([:apps, :development, name, index], h["url"])
+    end
+
+    self
+  end
+
+  def build_missing
+    warn("AND I DON'T EVEN KNOW!")
+    self
   end
 
   def header(label)
-    @menu_display << ''
-    @menu_display << Color.blue { label }
+    @lines << ''
+    @lines << Color.blue { label }
+  end
+
+  def warn(label)
+    @lines << ''
+    @lines << Color.red { label }
   end
 
   def choice(path, value)
-    ix = @menu_choices.length
-    @menu_display << Color.yellow{ ix.to_s } + '. ' + value.to_s
-    @menu_choices[ix] = path
-  end
-
-  def pick(ix)
-    if ix >= @menu_choices.length
-      nil
-    else
-      @menu_choices[ix]
-    end
-  end
-
-  def pick_config(ix)
-    path = pick(ix)
-    return :no_such_config if path.nil?
-    result = cfg
-    path.each do |x|
-      result = result[x]
-    end
-
-    [path, result]
+    ix = @choices.length
+    @lines << Color.yellow{ ix.to_s } + '. ' + value.to_s
+    @choices[ix] = path
   end
 end
 
@@ -93,97 +277,21 @@ shopifydev_command_set = Pry::CommandSet.new do
   create_command "switch" do
     description "switch shops"
 
-
     # opt is a Slop object, see https://github.com/injekt/slop/blob/master/README.md
     def options(opt)
     end
 
     def process
-      print_current_shop
-
-      config_menu = ConfigMenu.new(Shopifydev::Config.config).build
+      output.puts _pry_.switch.current_shop
 
       case true
       when args.empty?
-        config_menu.print(output)
+        _pry_.switch.reset # reset to the first menu page
+        output.puts _pry_.switch.menu.print
       when (args.length == 1)
         ix = args.first.to_i
-        path, cfg = config_menu.pick_config(ix)
-        if path == :no_such_config
-          output.puts Color.red{ "I don't know about #{ix}" }
-          config_menu.print(output)
-        else
-          handle_choice(path, cfg)
-        end
+        output.puts _pry_.switch.pick(ix)
       end
-    end
-
-    def print_current_shop
-      current_shop = ShopifyAPI::Base.site || 'none'
-      output.puts Color.green{ "current shop:"} + " #{current_shop}"
-    end
-
-    def handle_choice(path, cfg)
-      case path.first.to_sym
-      when :test_shops
-        url = "https://#{cfg[:api_key]}:#{cfg[:password]}@#{cfg[:myshopify_domain]}/admin/"
-        ShopifyAPI::Base.site = url
-        print_current_shop
-      when :apps
-        case path[1].to_sym
-        when :development
-          output.puts "you picked #{path.join('.')}"
-          output.puts cfg.inspect
-          app = LocalShopifyApp.new(cfg)
-          output.puts Color.yellow{ app.shops.inspect }
-        when :heroku
-          output.puts "you picked #{path.join('.')}"
-          output.puts cfg.inspect
-
-          output.puts Color.yellow{ "but it's not ready yet!"}          
-        else
-          output.puts "you picked #{path.join('.')}"
-          output.puts cfg.inspect
-          output.puts Color.red{ "AND I DON'T EVEN KNOW!"}          
-        end
-      else
-        output.puts "you picked #{path.join('.')}"
-        output.puts cfg.inspect
-        output.puts Color.red{ "AND I DON'T EVEN KNOW!"}          
-      end
-    end
-
-
-    def output_menu_choices(arr, ix=1)
-      my_ix = 0
-      arr.each do |item|
-        output.puts menu_choice(ix+my_ix, item.to_s)
-        my_ix +=1
-      end
-      my_ix
-    end
-
-    def menu_choice(ix, s)
-      Color.yellow{ ix.to_s } + '. ' + s.to_s
-    end
-
-    def menu_header(s)
-      Color.blue { s }
-    end
-
-    def write_menu(cfg) 
-      ix = 1
-      # output.puts "Test Shops"
-      output.puts menu_header("Test Shops")
-      ix += output_menu_choices(cfg[:test_shops].keys.sort, ix)
-
-      output.puts
-      output.puts menu_header("Local Apps")
-      ix += output_menu_choices(cfg[:apps][:development].keys.sort, ix)
-
-      output.puts
-      output.puts menu_header("Heroku Apps")
-      ix += output_menu_choices(cfg[:apps][:heroku].keys.sort, ix)
     end
   end
 end
