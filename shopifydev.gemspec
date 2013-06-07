@@ -20,7 +20,16 @@ Gem::Specification.new do |gem|
   gem.add_dependency "shopify_api", ">= 3.0.0"
   gem.add_dependency "ruby-filemagic", ">= 0.4.2"
   gem.add_dependency "gli", ">= 2.5.2"
-  gem.add_dependency 'json', '~> 1.7.7'
-  
+
+  # for console
+  gem.add_dependency 'oj'  
+  gem.add_dependency 'dalli'
+  gem.add_dependency 'shydra'
+  gem.add_dependency 'pry'
+  gem.add_dependency 'activesupport'
+  gem.add_dependency 'term-ansicolor'
+
+  # for generators
+  gem.add_dependency 'railties'
   gem.add_development_dependency "rake"
 end

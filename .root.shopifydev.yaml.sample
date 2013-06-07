@@ -1,0 +1,21 @@
+test_shops:
+  cronin:
+    api_key: akey
+    password: aword
+    myshopify_domain: cronin-group3575.myshopify.com
+  schumm:
+    api_key: anotherkey
+    password: anotherword
+    myshopify_domain: schumm-durgan-and-lang94.myshopify.com
+
+apps:
+  development:
+    meta: ~/clients/webify/metafieldeditor
+    ship: ~/clients/webify/shipping
+
+  heroku:
+    metafieldseditor:             metafieldseditor
+    morfars-metafields:           morfars-metafields
+    red-pepper-shipping:          red-pepper-shipping
+    shipping-lifemap-bioreagents: shipping-lifemap-bioreagents
+    shipping-staging:             shipping-staging
