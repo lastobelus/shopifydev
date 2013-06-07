@@ -4,7 +4,7 @@ require 'oj'
 class Switch
   def initialize
     @current_shop = ''
-    @menu = default_menu
+    reset!
   end
 
   def current_shop
@@ -12,8 +12,17 @@ class Switch
     Color.green{ "current shop:"} + " #{@current_shop}"
   end
 
-  def reset
+  def reset!
     @menu = default_menu
+    @finished = false
+  end
+
+  def finished?
+    @finished
+  end
+
+  def finish!
+    @finished = true
   end
 
   def menu
@@ -64,14 +73,18 @@ class Switch
   def handle_choice
     result = ''
 
-    case @cfg.class.to_s
-    when "String" then
+    case @cfg
+    when String then
       case @breadcrumbs[1].to_sym
       when :development then menu_method = self.method(:development_menu)
       when :heroku      then menu_method = self.method(:heroku_menu)
       else                   menu_method = self.method(:missing_menu)
       end
-    else result = handle_by_shop_type
+    when Hash
+      result = handle_by_shop_type
+      finish!
+    else
+      raise "don't know what to do with @cfg: #{@cfg.inspect}"
     end
 
     if menu_method
@@ -84,17 +97,18 @@ class Switch
 
   def handle_by_shop_type
     if @cfg.keys.include?("shop_type")
-      result =  case @cfg["shop_type"].to_sym
-                when :local then "local"
-                when :heroku then "heroku"
-                else "something else"
-                end
+      case @cfg["shop_type"].to_sym
+      when :local
+        session = ShopifyAPI::Session.new(@cfg['url'], @cfg['token'])
+        session.valid?  # returns true
+        ShopifyAPI::Base.activate_session(session)
+      when :heroku
+        puts Color.red{ "can't handle heroku yet"}
+      end
     else
       set_shop(@cfg[:api_key], @cfg[:password], @cfg[:myshopify_domain])
-      result = self.current_shop
     end
-
-    result
+    self.current_shop
   end
 
   def default_menu
@@ -112,8 +126,9 @@ class Switch
   # TODO this method is pretty obscure
   def development_menu
     # this needs to be memoized
-    app = LocalShopifyApp.new(@cfg)
-    shops = app.shops
+    @apps ||= {}
+    @apps[@cfg] ||= LocalShopifyApp.new(@cfg)
+    shops = @apps[@cfg].shops
 
     # add the shop_type to the array of shops
     shops.each do |shop|
@@ -126,6 +141,8 @@ class Switch
     # iterate over shopifydev.yaml and replace the local file path matching
     # domain with the list of shops associated with that domain
     # TODO drop M's terrible habbit of using k and v for key and value
+
+    # TODO: use detect
     shopify_config["apps"]["development"].each do |k, v|
       if v == domain
         shopify_config["apps"]["development"][k] = shops
@@ -174,11 +191,41 @@ class HerokuShopifyApp < ShopifyAppShopList
 end
 
 class LocalShopifyApp < ShopifyAppShopList
+  def refresh!
+    @data = nil
+  end
+
+  def url_column
+    data['url_column']
+  end
+
   def shops
-    json = `/bin/bash -l -c "unset BUNDLE_GEMFILE; cd #{path} 2> /dev/null; bundle exec rake shops 2>/dev/null"`
-    json = json.split("----snip----\n").last
-    json = json.split("\n").last
-    Oj.load json
+    data['shops']
+  end
+
+  def data
+    @data ||= begin
+      data = {}
+      if Pathname(path).expand_path == Pathname.getwd
+        url_column = 'myshopify_domain'
+        url_column = 'domain' unless ::Shop.column_names.include?(url_column)
+        url_column = 'url' unless ::Shop.column_names.include?(url_column)
+        data = {
+          'shops' => ::Shop.select("id,#{url_column},token").all.map(&:attributes),
+          'url_column' => url_column
+        }
+      else
+        json = `/bin/bash -l -c "unset BUNDLE_GEMFILE; cd #{path} 2> /dev/null; bundle exec rake shops 2>/dev/null"`
+        json = json.split("----snip----\n").last
+        json = json.split("\n").last
+        data = Oj.load(json)
+        # TODO: this should go away when we refactor into objects, since the app object will know what it's url_column is and be responsible for shop data
+      end
+      unless data['url_column'] == 'url'
+        data['shops'].each{|shop| shop['url'] = shop[data['url_column']]}
+      end
+      data
+    end
   end
 end
 
@@ -229,6 +276,9 @@ class ConfigMenu
 
     header("Local Apps")
     json[:apps][:development].each do |k, path|
+      if Pathname(path).expand_path == Pathname.getwd
+        path = Color.green{ path }
+      end
       choice([:apps, :development, k], path)
     end
 
@@ -287,11 +337,21 @@ shopifydev_command_set = Pry::CommandSet.new do
 
       case true
       when args.empty?
-        _pry_.switch.reset # reset to the first menu page
-        output.puts _pry_.switch.menu.print
-        # print "ima ask for input:"
-        # choice = $stdin.gets
-        # puts "you chose #{choice}"
+        _pry_.switch.reset! # reset to the first menu page
+        result = ''
+        until _pry_.switch.finished?
+          output.puts _pry_.switch.menu.print
+          print "❔  " + Color.yellow
+          choice = $stdin.gets
+          print Color.clear
+          if choice.blank?
+            _pry_.switch.reset!
+          else
+            result = _pry_.switch.pick(choice.chomp.to_i)
+          end
+        end
+        puts result
+        _pry_.switch.reset!
       when (args.length == 1)
         ix = args.first.to_i
         output.puts _pry_.switch.pick(ix)
