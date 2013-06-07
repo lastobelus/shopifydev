@@ -1,5 +1,3 @@
-puts "yo, included"
-
 module Shopifydev
   module ShopifyAPI
     module DirtyCache

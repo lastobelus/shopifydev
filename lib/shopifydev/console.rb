@@ -1,4 +1,5 @@
 require 'shopifydev/pry/commands'
+require 'shopifydev/pry/save_json'
 require 'shopifydev/shopify_api/caches'
 
 require 'term/ansicolor'

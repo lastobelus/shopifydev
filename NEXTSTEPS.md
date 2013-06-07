@@ -121,6 +121,5 @@ https://github.com/cldwalker/bond
 
 
 # Using pry features
-https://github.com/ConradIrwin/pry-rescue
--- we **really** want to be using this in test/development environments in rails apps. 
+https://github.com/ConradIrwin/pry-rescue -- we **really** want to be using this in test/development environments in rails apps. 
 https://github.com/envygeeks/pry-vterm_aliases
