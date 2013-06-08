@@ -1,8 +1,11 @@
 module Kernel
   def save_json(obj, path=nil)
+    path = Pathname.new(path) unless path.nil?
     json = Oj.dump(obj, object:true, circular:true)
+    path = path.sub_ext('json') unless path.nil?
     path = UnixTree.get_path(path, require: :file, new: true)
     if path
+      path = path.sub_ext('json') unless path.nil?
       puts Color.green{"writing json to #{path.to_s}..."}
       File.open(path, 'w'){|f| f.write(json)}
       true
