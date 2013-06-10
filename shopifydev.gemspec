@@ -32,4 +32,8 @@ Gem::Specification.new do |gem|
   # for generators
   gem.add_dependency 'railties'
   gem.add_development_dependency "rake"
+
+  # for fixtures
+  gem.add_dependency 'ffaker'
+  
 end
