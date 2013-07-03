@@ -2,6 +2,10 @@
 
 Abstract out and port to ruby the functionality of the shopify textmate bundle for use in other editors.
 
+## Compatibility
+
+shopifydev currently specifically targets **Rails 3.2.13**. This was due to a dependency problem with ```shopify_api``` that arose when Rails 4.0 was released. ASAP, shopifydev will be updated to rails 4.0
+
 ## Installation
 
 Add this line to your application's Gemfile:

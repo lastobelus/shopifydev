@@ -8,15 +8,26 @@ Gem::Specification.new do |gem|
   gem.version       = Shopifydev::VERSION
   gem.authors       = ["Michael Johnston"]
   gem.email         = ["lastobelus@mac.com"]
-  gem.description   = %q{Tools for using SCM with shopify.}
-  gem.summary       = %q{Abstract out and port to ruby the functionality of the shopify textmate bundle for use in other editors.}
-  gem.homepage      = ""
+  gem.description   = %q{Abstracts out and port to ruby the functionality of the shopify textmate bundle for use in other editors. Provides a shopify console with the ability to switch between configured shops, using either custom app or oauth token style authentication. Provides caches of objects and convenience methods for fetching them.}
+  gem.summary       = %q{ Tools for using SCM with shopify. Not Rails 4.0 ready. }
+  gem.homepage      = "https://github.com/lastobelus/shopifydev"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
   
+  gem.add_dependency "json", ">= 1.8.0"
+
+  # the release of Rails 4.0 caused a dependency problem with apps that specify both 
+  # shopifydev and shopify_api in their Gemfile, and so far the only way we've found 
+  # to deal with it is to explicitly specify a rails version, so shopifydev currently
+  # can only be used with rails 3.2.13
+
+  gem.add_dependency 'activeresource', "= 3.2.13"
+  gem.add_dependency 'railties', "= 3.2.13"
+  gem.add_dependency 'activesupport'
+
   gem.add_dependency "shopify_api", ">= 3.0.0"
   gem.add_dependency "ruby-filemagic", ">= 0.4.2"
   gem.add_dependency "gli", ">= 2.5.2"
@@ -26,11 +37,9 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'dalli'
   gem.add_dependency 'shydra'
   gem.add_dependency 'pry'
-  gem.add_dependency 'activesupport'
   gem.add_dependency 'term-ansicolor'
 
   # for generators
-  gem.add_dependency 'railties'
   gem.add_development_dependency "rake"
 
   # for fixtures
