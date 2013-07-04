@@ -378,6 +378,21 @@ shopifydev_command_set = Pry::CommandSet.new do
    UnixTree.print_tree(path) # moved to module so can use in save_json & load_json
   end
 
+  block_command "consume_api", "use up Shopify API calls until only [x] remain (default 0)" do |num|
+
+    num ||= 1
+    puts Color.yellow{ "consuming api calls until only #{num} are left..."}
+    res = Shydra::Resources::Product.new.run
+    pids = res.data.map{|r| r['id']}
+    used, max = res.headers['HTTP_X_SHOPIFY_SHOP_API_CALL_LIMIT'].split('/').map(&:to_i)
+    h = Shydra::Hydra.new(max_concurrency: 50)
+    to_consume = max - used - num - 1
+    if to_consume > 0
+      to_consume.times{ h.queue(Shydra::Resources::Product.new(id: pids.sample)) }
+      h.run
+    end    
+  end
+
 end
 
 Pry::Commands.import shopifydev_command_set
