@@ -381,6 +381,7 @@ shopifydev_command_set = Pry::CommandSet.new do
   block_command "consume_api", "use up Shopify API calls until only [x] remain (default 0)" do |num|
 
     num ||= 1
+    num = num.to_i
     puts Color.yellow{ "consuming api calls until only #{num} are left..."}
     res = Shydra::Resources::Product.new.run
     pids = res.data.map{|r| r['id']}
