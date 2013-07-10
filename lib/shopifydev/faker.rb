@@ -11,14 +11,17 @@ module Shopifydev
       owner_id = owner && owner.id
       metafield = ::ShopifyAPI::Metafield.new(
       {
-        owner_resource: owner_resource,
-        owner_id: owner_id,
         namespace: opts[:namespace] || namespace,
         key: opts[:key] || key,
         value_type: 'string',
         value: opts[:value] || value
       }
       )
+      unless owner.is_a?(::ShopifyAPI::Shop)
+        metafield.owner_resource = owner_resource
+        metafield.owner_id = owner_id
+      end
+
       metafield.save! if owner_id
       metafield
     end
@@ -38,7 +41,9 @@ module Shopifydev
     end
 
     def key
-      ::Faker::Lorem.word.downcase
+      k = ""
+      while((k = ::Faker::Lorem.word).length < 3);end
+      k.downcase
     end
 
     def value
