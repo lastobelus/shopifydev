@@ -1,4 +1,4 @@
-# switch command
+ # switch command
 
 Z(2013.06.06):
   M, I think you should work on memoizing the shop array and the 'refresh'
@@ -123,3 +123,8 @@ https://github.com/cldwalker/bond
 # Using pry features
 https://github.com/ConradIrwin/pry-rescue -- we **really** want to be using this in test/development environments in rails apps. 
 https://github.com/envygeeks/pry-vterm_aliases
+
+
+
+# Switch should reload last client. If it has been less than 30 minutes, automatically. If it has been more than 30 minutes, ask [y/n/s]
+
