@@ -355,6 +355,7 @@ shopifydev_command_set = Pry::CommandSet.new do
         puts result
         _pry_.switch.reset!
       when (args.length == 1)
+        _pry_.switch.reset! # reset to the first menu page
         ix = args.first.to_i
         output.puts _pry_.switch.pick(ix)
       end
