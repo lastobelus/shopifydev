@@ -1,12 +1,8 @@
 module Shopifydev
   module ShopifyAPI
     module DirtyCache
-      def dirty!
-        ShopifyAPI.dirty!
-      end
-
       def site=(uri)
-        ShopifyAPI.dirty!
+        ::ShopifyAPI.dirty!
         super uri
       end
     end
@@ -15,7 +11,8 @@ end
 
 module ShopifyAPI
   class Base
-    include Shopifydev::ShopifyAPI::DirtyCache
+    puts "include Shopifydev::ShopifyAPI::DirtyCache"
+    extend Shopifydev::ShopifyAPI::DirtyCache
   end
 end
 
