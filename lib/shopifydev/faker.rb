@@ -5,6 +5,8 @@ module Shopifydev
     extend ::Faker::ModuleUtils
     extend self
 
+    NL = "\n"
+
 
     def metafield(owner=nil, opts={})
       owner_resource = owner && owner.class.element_name 
@@ -47,8 +49,50 @@ module Shopifydev
     end
 
     def value
-      ::Faker::Lorem.sentence(rand(10))
+      ::Faker::Lorem.sentence(rand(10) + 1)
     end
 
+    def csv_value
+      value.gsub('"','').gsub(',', '')[0..-2]
+    end
+
+    def metafield_import_csv(resources, opts={})
+      opts[:import_type] ||= :product_variant_sku
+      opts[:num] ||= 1
+      opts[:namespace] ||= namespace
+      opts[:keys] ||= [key]
+      opts[:keys] = [opts[:keys]].flatten
+      resources = [resources].flatten
+
+      while(opts[:keys].length < opts[:num]); opts[:keys] << key; end
+
+      puts "opts: #{opts.inspect}" if opts[:verbose]
+
+      case opts[:import_type]
+      when :owner_resource
+      when :product_handle
+      when :product_variant_sku
+      when :product_variant_multikey
+        out = %w{sku namespace} 
+        out += opts[:keys]
+        out = out.join(',')
+        out << NL
+
+        resources.each do |r|
+          line = [r.sku, opts[:namespace]]
+          values = opts[:values]
+          values ||= [csv_value]
+          values = [values].flatten
+          while(values.length < opts[:num]); values << csv_value; end
+          line += values
+          out << line.join(',')
+          out << NL
+        end
+
+      end
+
+      out
+
+    end
   end
 end
