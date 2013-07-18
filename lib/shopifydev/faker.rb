@@ -60,13 +60,8 @@ module Shopifydev
       opts[:import_type] ||= :product_variant_sku
       opts[:num] ||= 1
       opts[:namespace] ||= namespace
-      opts[:keys] ||= [key]
-      opts[:keys] = [opts[:keys]].flatten
-      resources = [resources].flatten
 
-      while(opts[:keys].length < opts[:num]); opts[:keys] << key; end
-
-      puts "opts: #{opts.inspect}" if opts[:verbose]
+      out = ""
 
       case opts[:import_type]
       when :owner_resource
@@ -78,8 +73,8 @@ module Shopifydev
         out = out.join(',')
         out << NL
 
-        resources.each do |r|
-          line = [r.sku, opts[:namespace]]
+        resources.each do |resource|
+          line = [resource.sku, opts[:namespace]]
           values = opts[:values]
           values ||= [csv_value]
           values = [values].flatten
@@ -88,11 +83,11 @@ module Shopifydev
           out << line.join(',')
           out << NL
         end
-
+      else
+        raise "don't know how to create import csv for #{opts[:type].to_s}"
       end
 
       out
-
     end
   end
 end
