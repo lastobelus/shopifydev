@@ -380,23 +380,17 @@ shopifydev_command_set = Pry::CommandSet.new do
   end
 
   block_command "consume_api", "use up Shopify API calls until only [x] remain (default 0)" do |num|
-
-    num ||= 1
-    num = num.to_i
-    puts Color.yellow{ "consuming api calls until only #{num} are left..."}
-    res = Shydra::Resources::Product.new.run
-    pids = res.data.map{|r| r['id']}
-    used, max = res.headers['HTTP_X_SHOPIFY_SHOP_API_CALL_LIMIT'].split('/').map(&:to_i)
-    puts "used: #{used.inspect} max: #{max.inspect}"
-    h = Shydra::Hydra.new(max_concurrency: 50)
-    to_consume = max - used - num - 2
-    puts "queueing to_consume: #{to_consume.inspect} requests"
-    if to_consume > 0
-      to_consume.times{ h.queue(Shydra::Resources::Product.new(id: pids.sample)) }
-      h.run
-      ShopifyAPI::Shop.current
+    require "shopifydev/shopify_api/consume_api"
+    report = Shopifydev::ShopifyAPI::ConsumeAPI.consume(num) do |report_line|
+      case report_line.first.first
+      when :info
+        puts Color.yellow{ report_line.first.last }
+      when :status
+        puts Color.blue{ report_line.first.last }
+      else
+        puts report_line.first.last
+      end
     end
-    puts Color.blue{ "credit_left: #{ShopifyAPI.credit_left}"}
   end
 
 end
