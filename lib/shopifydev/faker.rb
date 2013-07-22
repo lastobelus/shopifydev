@@ -57,11 +57,18 @@ module Shopifydev
     end
 
     def metafield_import_csv(resources, opts={})
-      opts[:import_type] ||= :product_variant_sku
+      opts[:import_type] ||= :product_variant_multikey
       opts[:num] ||= 1
       opts[:namespace] ||= namespace
+      opts[:keys] ||= [key]
+      opts[:keys] = [opts[:keys]].flatten
+
+      resources = [resources].flatten
 
       out = ""
+
+      while(opts[:keys].length < opts[:num]); opts[:keys] << key; end
+      puts "opts: #{opts.inspect}" if opts[:verbose]
 
       case opts[:import_type]
       when :owner_resource
@@ -87,7 +94,16 @@ module Shopifydev
         raise "don't know how to create import csv for #{opts[:type].to_s}"
       end
 
-      out
+      if opts[:file]
+        opts[:file] << ".csv" unless opts[:file].include?('.csv')
+        File.open(opts[:file], 'w') { |file|
+          file.write(out)
+        }
+        puts "wrote #{out.lines.to_a.length - 1} records to #{opts[:file]}"
+        nil
+      else
+        out
+      end
     end
   end
 end
