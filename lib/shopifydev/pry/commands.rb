@@ -387,12 +387,16 @@ shopifydev_command_set = Pry::CommandSet.new do
     res = Shydra::Resources::Product.new.run
     pids = res.data.map{|r| r['id']}
     used, max = res.headers['HTTP_X_SHOPIFY_SHOP_API_CALL_LIMIT'].split('/').map(&:to_i)
+    puts "used: #{used.inspect} max: #{max.inspect}"
     h = Shydra::Hydra.new(max_concurrency: 50)
-    to_consume = max - used - num - 1
+    to_consume = max - used - num - 2
+    puts "queueing to_consume: #{to_consume.inspect} requests"
     if to_consume > 0
       to_consume.times{ h.queue(Shydra::Resources::Product.new(id: pids.sample)) }
       h.run
-    end    
+      ShopifyAPI::Shop.current
+    end
+    puts Color.blue{ "credit_left: #{ShopifyAPI.credit_left}"}
   end
 
 end
