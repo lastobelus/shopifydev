@@ -382,13 +382,13 @@ shopifydev_command_set = Pry::CommandSet.new do
   block_command "consume_api", "use up Shopify API calls until only [x] remain (default 0)" do |num|
     require "shopifydev/shopify_api/consume_api"
     report = Shopifydev::ShopifyAPI::ConsumeAPI.consume(num) do |report_line|
-      case report_line.first.first
+      case report_line.level
       when :info
-        puts Color.yellow{ report_line.first.last }
+        puts Color.yellow{ report_line.msg }
       when :status
-        puts Color.blue{ report_line.first.last }
+        puts Color.blue{ report_line.msg}
       else
-        puts report_line.first.last
+        puts report_line.msg
       end
     end
   end
