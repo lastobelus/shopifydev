@@ -1,4 +1,5 @@
 require 'shydra'
+require 'shydra/hydra'
 
 module Shopifydev
   module ShopifyAPI
