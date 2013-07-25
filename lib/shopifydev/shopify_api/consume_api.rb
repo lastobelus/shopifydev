@@ -1,3 +1,5 @@
+require 'shydra'
+
 module Shopifydev
   module ShopifyAPI
     module ConsumeAPI
