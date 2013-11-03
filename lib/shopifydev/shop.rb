@@ -11,15 +11,15 @@ module Shopifydev
 
       ShopifyAPI::Base.clear_session
       if credentials['token']
+        session = ShopifyAPI::Session.new(credentials['url'], credentials['token'])
+        session.valid?  # returns true
+        ShopifyAPI::Base.activate_session(session)
+      else
         ShopifyAPI::Base.site = "https://" + 
           credentials['api_key'] + ':' + 
           credentials['password'] + '@' + 
           credentials['url'] + '/admin' 
         logger.debug("set shopify site to #{ShopifyAPI::Base.site}")
-      else
-        session = ShopifyAPI::Session.new(credentials['url'], credentials['token'])
-        session.valid?  # returns true
-        ShopifyAPI::Base.activate_session(session)
       end
     end
 
