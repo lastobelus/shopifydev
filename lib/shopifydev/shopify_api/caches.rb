@@ -84,7 +84,12 @@ EOF
         self.replace(entity.find(:all, params: self.params))
         self.since = Time.now
         puts "#{self.length} records."
-        nil
+        self
+      }}
+      obj.singleton_class.class_eval{define_method(:delete_all) {
+        puts "deleting all #{entity.collection_name}..."
+        self.each{|e| entity.delete(e.id)}
+        self.r
       }}
     end
 
