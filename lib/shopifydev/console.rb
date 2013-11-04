@@ -1,4 +1,13 @@
-class Color
+require 'shopifydev/pry/commands'
+require 'shopifydev/pry/save_json'
+require 'shopifydev/shopify_api/caches'
+
+require 'term/ansicolor' 
+
+require 'shydra'
+require 'shydra/hydra'
+
+class TColor
   if Pry.config.color
     extend Term::ANSIColor
   else
@@ -9,15 +18,6 @@ class Color
     end
   end
 end
-
-require 'shopifydev/pry/commands'
-require 'shopifydev/pry/save_json'
-require 'shopifydev/shopify_api/caches'
-
-require 'term/ansicolor' 
-
-require 'shydra'
-require 'shydra/hydra'
 
 
 

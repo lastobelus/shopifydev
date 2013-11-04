@@ -9,7 +9,7 @@ class Switch
 
   def current_shop
     @current_shop = ShopifyAPI::Base.site || 'none'
-    Color.green{ "current shop:"} + " #{@current_shop}"
+    TColor.green{ "current shop:"} + " #{@current_shop}"
   end
 
   def reset!
@@ -36,7 +36,7 @@ class Switch
     @breadcrumbs, @cfg = pick_config(ix)
 
     if @breadcrumbs == :no_such_config
-      result << Color.red{ "I don't know about #{ix}\n" }
+      result << TColor.red{ "I don't know about #{ix}\n" }
       result << self.menu.print
     else
       # update the menu based on the choice
@@ -90,7 +90,7 @@ class Switch
     if menu_method
       result << "you picked #{@breadcrumbs.join('.')}\n"
       result << @cfg.inspect + "\n"
-      result << Color.yellow { menu_method.call.print }
+      result << TColor.yellow { menu_method.call.print }
     end
     result
   end
@@ -104,7 +104,7 @@ class Switch
         session.valid?  # returns true
         ShopifyAPI::Base.activate_session(session)
       when :heroku
-        puts Color.red{ "can't handle heroku yet"}
+        puts TColor.red{ "can't handle heroku yet"}
       end
     else
       ShopifyAPI::Base.clear_session
@@ -279,7 +279,7 @@ class ConfigMenu
     header("Local Apps")
     json[:apps][:development].each do |k, path|
       if Pathname(path).expand_path == Pathname.getwd
-        path = Color.green{ path }
+        path = TColor.green{ path }
       end
       choice([:apps, :development, k], path)
     end
@@ -311,17 +311,17 @@ class ConfigMenu
   # TODO I think these three related methods could be moved into a module called "Writer" or something
   def header(label)
     @lines << ''
-    @lines << Color.blue { label }
+    @lines << TColor.blue { label }
   end
 
   def warn(label)
     @lines << ''
-    @lines << Color.red { label }
+    @lines << TColor.red { label }
   end
 
   def choice(path, value)
     ix = @choices.length
-    @lines << Color.yellow{ ix.to_s } + '. ' + value.to_s
+    @lines << TColor.yellow{ ix.to_s } + '. ' + value.to_s
     @choices[ix] = path
   end
 end
@@ -343,9 +343,9 @@ shopifydev_command_set = Pry::CommandSet.new do
         result = ''
         until _pry_.switch.finished?
           output.puts _pry_.switch.menu.print
-          print "❔  " + Color.yellow
+          print "❔  " + TColor.yellow
           choice = $stdin.gets
-          print Color.clear
+          print TColor.clear
           if choice.blank?
             _pry_.switch.reset!
           else
@@ -366,10 +366,10 @@ shopifydev_command_set = Pry::CommandSet.new do
     def process
       case  args.first
       when 'off'
-        puts Color.black{"ActiveResource logging "} + Color.red{'off'}
+        puts TColor.black{"ActiveResource logging "} + TColor.red{'off'}
         ActiveResource::Base.logger = nil
       else      
-        puts Color.black{"ActiveResource logging "} + Color.yellow{'on'}
+        puts TColor.black{"ActiveResource logging "} + TColor.yellow{'on'}
         ActiveResource::Base.logger = Logger.new STDOUT
       end
     end
@@ -384,9 +384,9 @@ shopifydev_command_set = Pry::CommandSet.new do
     report = Shopifydev::ShopifyAPI::ConsumeAPI.consume(num) do |report_line|
       case report_line.level
       when :info
-        puts Color.yellow{ report_line.msg }
+        puts TColor.yellow{ report_line.msg }
       when :status
-        puts Color.blue{ report_line.msg}
+        puts TColor.blue{ report_line.msg}
       else
         puts report_line.msg
       end

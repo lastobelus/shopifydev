@@ -23,18 +23,18 @@ module ShopifyAPI
       dirty?
       subset = ''
       opts = ''
-      length = Color.black{'unloaded'}
+      length = TColor.black{'unloaded'}
       since = ''
       unless cache.nil?
         if !show_opts && (cache.params.keys.to_set != Set[:limit])
-          subset = Color.red('!')
+          subset = TColor.red('!')
         end
         if show_opts
-          opts = cache.params.map{|k, v| Color.magenta{k.to_s} + Color.black{':'} + Color.green{v.to_s}}.join(Color.black{', '})
+          opts = cache.params.map{|k, v| TColor.magenta{k.to_s} + TColor.black{':'} + TColor.green{v.to_s}}.join(TColor.black{', '})
           opts = "\n  #{opts}"
         end
-        length = (cache.length > 0) ? "#{cache.length.to_s}#{subset} #{Color.black{cache.label}}" : 'empty'
-        since = "#{Color.black{'on:'}}#{cache.since.strftime("%a %H:%M:%S")}"
+        length = (cache.length > 0) ? "#{cache.length.to_s}#{subset} #{TColor.black{cache.label}}" : 'empty'
+        since = "#{TColor.black{'on:'}}#{cache.since.strftime("%a %H:%M:%S")}"
       end
       "#{length.ljust(18)} #{since}#{opts}"
     end
@@ -43,13 +43,13 @@ module ShopifyAPI
       return if warn_site
       dirty?
       puts <<-EOF
-#{Color.blue{'products'}}:           #{cache_status(@@products, show_opts)}
-#{Color.blue{'variants'}}:           #{cache_status(@@variants, show_opts)}
-#{Color.blue{'metafields'}}:         #{cache_status(@@metafields, show_opts)}
-#{Color.blue{'orders'}}:             #{cache_status(@@orders, show_opts)}
-#{Color.blue{'customers'}}:          #{cache_status(@@customers, show_opts)}
-#{Color.blue{'custom_collections'}}: #{cache_status(@@custom_collections, show_opts)}
-#{Color.blue{'smart_collections'}}:  #{cache_status(@@smart_collections, show_opts)}
+#{TColor.blue{'products'}}:           #{cache_status(@@products, show_opts)}
+#{TColor.blue{'variants'}}:           #{cache_status(@@variants, show_opts)}
+#{TColor.blue{'metafields'}}:         #{cache_status(@@metafields, show_opts)}
+#{TColor.blue{'orders'}}:             #{cache_status(@@orders, show_opts)}
+#{TColor.blue{'customers'}}:          #{cache_status(@@customers, show_opts)}
+#{TColor.blue{'custom_collections'}}: #{cache_status(@@custom_collections, show_opts)}
+#{TColor.blue{'smart_collections'}}:  #{cache_status(@@smart_collections, show_opts)}
 EOF
     end
 

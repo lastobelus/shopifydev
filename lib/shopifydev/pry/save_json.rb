@@ -6,7 +6,7 @@ module Kernel
     path = UnixTree.get_path(path, require: :file, new: true)
     if path
       path = path.sub_ext('json') unless path.nil?
-      puts Color.green{"writing json to #{path.to_s}..."}
+      puts TColor.green{"writing json to #{path.to_s}..."}
       File.open(path, 'w'){|f| f.write(json)}
       true
     else
@@ -17,7 +17,7 @@ module Kernel
   def load_json(path=nil)
     path = UnixTree.get_path(path, require: :file)
     if path
-      puts Color.green{"loading json from #{path.to_s}..."}
+      puts TColor.green{"loading json from #{path.to_s}..."}
       Oj.load(path)
     else
       nil
@@ -35,12 +35,12 @@ module UnixTree
         path.expand_path.descend{|p| unless p.exist?; missing = p; break; end} if path      
         if missing
           what = (missing == path) ? opts[:require].to_s : 'directory'
-          puts Color.red{ "couldn't find #{what} #{missing.to_s}" } 
+          puts TColor.red{ "couldn't find #{what} #{missing.to_s}" } 
           missing = missing.dirname
           print_tree missing
 
         end 
-        print Color.yellow{ "enter path: "}
+        print TColor.yellow{ "enter path: "}
         in_path = $stdin.gets.chomp
         return nil if in_path == 'q'
         unless in_path.blank?
@@ -74,8 +74,8 @@ module UnixTree
       path ||= Pathname.getwd
       path = Pathname.new(path) unless path.is_a?(Pathname)
       path = path.dirname if path.file?
-      puts Color.blue{ "listing #{path}..."}
-      puts `cd #{path.expand_path.to_s}; tree`.gsub(%r{(^[^\w]+)}, Color.black{'\1'})
+      puts TColor.blue{ "listing #{path}..."}
+      puts `cd #{path.expand_path.to_s}; tree`.gsub(%r{(^[^\w]+)}, TColor.black{'\1'})
     end
   end
 end
