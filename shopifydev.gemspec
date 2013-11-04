@@ -19,13 +19,8 @@ Gem::Specification.new do |gem|
   
   gem.add_dependency "json", ">= 1.8.0"
 
-  # the release of Rails 4.0 caused a dependency problem with apps that specify both 
-  # shopifydev and shopify_api in their Gemfile, and so far the only way we've found 
-  # to deal with it is to explicitly specify a rails version, so shopifydev currently
-  # can only be used with rails 3.2.13
-
-  gem.add_dependency 'activeresource', "= 3.2.13"
-  gem.add_dependency 'railties', "= 3.2.13"
+  gem.add_dependency 'activeresource'
+  gem.add_dependency 'railties'
   gem.add_dependency 'activesupport'
 
   gem.add_dependency "shopify_api", ">= 3.0.0"
