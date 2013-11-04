@@ -17,6 +17,12 @@ module ShopifyAPI
 end
 
 module ShopifyAPI
+  class VariantWithProduct < Base
+    self.prefix = "/admin/"
+    self.element_name = "variant"
+    self.collection_name = "variants"
+  end
+
   class << self
 
     def cache_status(cache, show_opts=false)
@@ -129,7 +135,7 @@ EOF
     def variants(opts={limit: 250})
       return if warn_site
       @@variants ||= nil
-      @@variants = fetch_cache(ShopifyAPI::Variant, opts, @@variants)
+      @@variants = fetch_cache(ShopifyAPI::VariantWithProduct, opts, @@variants)
       @@variants
 
     end

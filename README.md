@@ -125,11 +125,13 @@ Assuming you ```cd ShopifyAPI```:
         caches
         => lists status of all the caches & when they were last
            reloaded. Will show an ! next to records that were fetched
-           with params.
+           with params. Example:
         
         caches true
         => shows params the caches were loaded with
         
+        products.delete_all
+        => delete all the products in the cache & reload the cache
 
 
 
