@@ -105,5 +105,19 @@ module Shopifydev
         out
       end
     end
+
+    def product(opts={})
+      num = opts.delete(:num) || 1
+      verbose = opts.delete(:verbose)
+      defaults = {
+        
+      }
+      1.upto(num) do i
+        interpolated_opts = defaults.merge(opts).deep_dup
+        interpolated_opts.deep_merge!(interpolated_opts){|key,v1| v1.gsub('###INDEX###', i)}
+        product = ::ShopifyAPI::Product.create(interpolated_opts)
+        puts "created #{product}" if verbose
+      end
+    end
   end
 end
