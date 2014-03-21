@@ -1,0 +1,4 @@
+/ shopify_handle is used as example so empty ui doesn't cause error
+td
+  = f.text_field(:shopify_handle, class: "radius")
+  = inline_error(product_cache, :shopify_handle) if show_errors

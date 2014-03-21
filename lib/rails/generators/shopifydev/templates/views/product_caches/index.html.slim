@@ -1,0 +1,64 @@
+- title "Products"
+- show_errors = @product_caches.empty?
+= paginate(@product_caches) unless show_errors
+#product-status.alert.secondary.round Updating...
+= form_tag update_multiple_product_caches_path, method: :put
+  = hidden_field_tag 'page', params[:page]
+  table.product-caches-list
+    thead
+      tr
+        th Shopify ID
+        th Product
+        == render 'app_fields_header'
+    tbody
+      - @product_caches.each do |product_cache|
+        = fields_for "product_caches[]", product_cache do |f|
+          tr class="#{product_cache.errors.empty? ? 'valid' : 'error'}"
+            td.text-cell = product_cache.shopify_product_id
+            td.text-cell = product_cache.shopify_title
+            == render 'app_fields'
+      tr
+        td colspan='3'
+          ul.button-group.radius.right
+            - if @product_caches.empty?
+              = link_to "Cancel", product_caches_path(page: params[:page]), class: "button secondary"
+            = submit_tag "Save All", class: 'button'
+
+= paginate(@product_caches) unless show_errors
+javascript:
+  $('#product-status').on('click', function(){
+    var elm = $(this);
+    $.ajax({
+      type: 'GET',
+      url: '/product_caches/update_status',
+      data: {jid: elm.data('jid')},
+      statusCode: {
+        206: function(){
+          setTimeout(function(){
+            elm.trigger('click'), 2000
+          })
+        }
+      }
+    })
+    .done(function(data){
+      var h = data.status;
+      var warn = false;
+      if( data.created_ids.length > 0 ) {
+        h += " "+data.created_ids.length+" new"
+        warn = true;
+      }
+      if( data.updated_ids.length > 0 ) {
+        h += " "+data.updated_ids.length+" changed"
+        warn = true;
+      }
+      if( warn ) {
+        elm.removeClass('secondary');
+        elm.addClass('warning')
+      }
+      elm.html(h);
+    })
+  })
+  
+  $(function () {
+    $('#product-status').trigger('click');
+  });
