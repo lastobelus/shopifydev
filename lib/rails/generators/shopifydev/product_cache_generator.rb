@@ -6,7 +6,7 @@ module Shopifydev
     source_root File.expand_path('../templates', __FILE__)
 
     def generate_product_cache
-      generate 'model ProductCache shop:references shopify_product_id:integer shopify_title:string shopify_handle:string shopify_product_type:string shopify_vendor:string shopify_updated_at:datetime'
+      generate 'migration ProductCache shop:references shopify_product_id:integer shopify_title:string shopify_handle:string shopify_product_type:string shopify_vendor:string shopify_updated_at:datetime'
     end
     
     def generate_worker
