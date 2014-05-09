@@ -119,7 +119,7 @@ EOF
         obj.r(msg)
       elsif (obj.params != opts)
         msg = "reloading #{entity.collection_name} with new params..."
-        obj.params = opts
+        obj.params = opts.merge({limit: false})
         obj.r(msg)
       end
       obj
