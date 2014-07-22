@@ -1,5 +1,6 @@
 require 'active_support/core_ext/hash'
 require 'singleton'
+require "yaml"
 
 module Shopifydev
   module Config

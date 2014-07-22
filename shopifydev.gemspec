@@ -28,12 +28,13 @@ Gem::Specification.new do |gem|
   gem.add_dependency "gli", ">= 2.5.2"
 
   # for console
-  gem.add_dependency 'oj'  
+  gem.add_dependency 'oj'
   gem.add_dependency 'dalli'
   gem.add_dependency 'shydra'
   gem.add_dependency 'shopify_unlimited'
   gem.add_dependency 'pry'
   gem.add_dependency 'term-ansicolor'
+  gem.add_dependency 'awesome_print'
 
   # for generators
   gem.add_development_dependency "rake"

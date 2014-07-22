@@ -1,5 +1,6 @@
 # encoding: UTF-8
 require 'oj'
+require 'shopifydev/test'
 
 class Switch
   def initialize
