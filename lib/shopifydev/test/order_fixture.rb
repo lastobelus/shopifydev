@@ -109,9 +109,16 @@ module Shopifydev
     
       def new_order(opts={})
         period = opts.delete(:in_period)
-        if period
-          opts[:created_at] = period[:created_at_min] + rand(period[:created_at_max] - period[:created_at_min])
+        case period
+        when Range
+          opts[:created_at] = period.first + rand(period.last - period.first)
+        when Hash
+          opts[:created_at] = period[:created_at_min]
+          opts[:created_at] += rand(period[:created_at_max] - period[:created_at_min]) if period[:created_at_max].present?
+        when Time, Date
+          opts[:created_at] = period
         end
+        opts[:updated_at] ||= opts[:created_at] if opts[:created_at].present?
         opts = order_attrs(opts)
         order = nil
         shop.with_shopify_session do
