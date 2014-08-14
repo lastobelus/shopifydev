@@ -118,7 +118,7 @@ module Shopifydev
         when Time, Date
           opts[:created_at] = period
         end
-        opts[:updated_at] ||= opts[:created_at] if opts[:created_at].present?
+        opts[:fulfillment_status] = "fulfilled" if opts.delete(:fulfilled)
         opts = order_attrs(opts)
         order = nil
         shop.with_shopify_session do
@@ -137,6 +137,35 @@ module Shopifydev
         end
         order
       end
+      
+      def create_orders!(opts={})
+        num = opts.delete(:num) || 1
+        orders = []
+        num.times do
+          order = create_order!(opts)
+          orders << order
+          opts[:created_at] = Time.parse(order.created_at) + rand(60) + 10 if opts[:created_at].present?
+        end
+        orders
+      end
+
+      def fulfill(orders)
+        orders = [orders].flatten
+        orders.each do |order|
+          order_id = nil
+          if order.is_a?(::ShopifyAPI::Order)
+            next if order.fulfillment_status == "fulfilled"
+            order_id = order.id
+          else
+            order_id = order.to_i
+          end
+          ::ShopifyAPI::Fulfillment.create({
+            tracking_number: nil,
+            order_id: order_id
+          })
+        end
+      end
+
     end
   end
 end
