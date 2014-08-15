@@ -44,6 +44,7 @@ module Shopifydev
 
         if opts[:variant_id]
           variant = variants.find{|v| v.id.to_s == opts[:variant_id].to_s}
+          variant ||= product.variants.sample if product
           raise "don't know about a variant with id #{opts[:variant_id]}" if variant.nil?
         end
         variant ||= products.sample.variants.sample
@@ -73,29 +74,83 @@ module Shopifydev
         out
       end
 
-      def address_attrs
+      def us_address_attrs(opts={})
         require_relative 'valid_zip'
         place = ValidZip.valid_place
         first_name = ::Faker::Name.first_name
         last_name  = ::Faker::Name.last_name
-        {
+        attrs = {
           first_name:   first_name,
           last_name:    last_name,
-          name:         [first_name, last_name].join(' '),
           address1:     ::Faker::AddressUS.street_address,
           phone:        ::Faker::PhoneNumber.phone_number,
           city:         place[:city],
           province:     place[:state],
           country:      "US",
           zip:          place[:zip]
-        }.deep_merge(@address_defaults)
+        }.deep_merge(@address_defaults).deep_merge(opts)
+        attrs[:name] ||= [first_name, last_name].join(' ')
+        attrs
       end
 
+      def cad_address_attrs(opts={})
+        require_relative 'valid_postal_code'
+        place = ValidPostalCode.valid_place
+        first_name = ::Faker::Name.first_name
+        last_name  = ::Faker::Name.last_name
+        attrs = {
+          first_name:   first_name,
+          last_name:    last_name,
+          address1:     ::Faker::AddressCA.street_address,
+          phone:        ::Faker::PhoneNumber.phone_number,
+          city:         place[:city],
+          province:     place[:province],
+          country:      "CA",
+          zip:          place[:postal_code]
+        }.deep_merge(@address_defaults).deep_merge(opts)
+        attrs[:name] ||= [first_name, last_name].join(' ')
+        attrs
+      end
+
+      def address_attrs(opts=nil)
+        case opts
+        when 'cad', 'CAD', 'ca', 'CA', :cad
+          cad_address_opts(opts)
+        when 'us', 'US', :us
+          cad_address_opts(opts)
+        when Hash
+          country = opts[:country]
+          case country.downcase
+          when 'ca', 'cad', 'canada'
+            cad_address_attrs(opts)
+          when 'us', 'united states'
+            us_address_attrs(opts)
+          else
+            [cad_address_attrs(opts), us_address_attrs(opts)].sample
+          end
+        else
+          [cad_address_attrs, us_address_attrs].sample
+        end
+      end
+      
       def order_attrs(opts={})
+        address = opts.delete(:address)
+        address = address_attrs(address) if address
+        billing_address = opts.delete(:billing_address)
+        billing_address = address_attrs(billing_address) if billing_address
+        billing_address ||= address
+        billing_address ||= address_attrs
+        
+        shipping_address = opts.delete(:shipping_address)
+        shipping_address = address_attrs(shipping_address) if shipping_address
+        shipping_address ||= address
+        shipping_address ||= address_attrs
+
+        opts.delete(:address)
         {
           line_items: line_items_attrs(opts),
-          billing_address: address_attrs,
-          shipping_address: address_attrs,
+          billing_address: billing_address,
+          shipping_address: shipping_address,
           financial_status: 'paid',
           email: ::Faker::Internet.email
         }.deep_merge(@order_defaults).deep_merge(opts)
