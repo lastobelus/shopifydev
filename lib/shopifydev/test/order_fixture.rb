@@ -89,7 +89,7 @@ module Shopifydev
           country:      "US",
           zip:          place[:zip]
         }.deep_merge(@address_defaults).deep_merge(opts)
-        attrs[:name] ||= [first_name, last_name].join(' ')
+        attrs[:name] = [attrs[:first_name], attrs[:last_name]].join(' ')
         attrs
       end
 
@@ -108,7 +108,7 @@ module Shopifydev
           country:      "CA",
           zip:          place[:postal_code]
         }.deep_merge(@address_defaults).deep_merge(opts)
-        attrs[:name] ||= [first_name, last_name].join(' ')
+        attrs[:name] = [attrs[:first_name], attrs[:last_name]].join(' ')
         attrs
       end
 
