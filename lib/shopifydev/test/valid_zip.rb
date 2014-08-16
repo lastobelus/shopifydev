@@ -4268,13 +4268,22 @@ module ValidZip
  "99901", "99903", "99918", "99919", "99921", "99922", "99923", "99925", "99926", "99927",
  "99928", "99929", "99950"]
  
- def self.valid_zip
-   ValidZip::Zips.sample
- end
- def self.valid_place
-   zip = valid_zip
-   Oj.load(
-     `curl http://zip.elevenbasetwo.com/v2/US/#{zip}`
-   ).with_indifferent_access.merge(zip: zip)
- end
+  def self.valid_zip
+    ValidZip::Zips.sample
+  end
+
+  def self.valid_place(opts=nil)
+    place = nil
+    tries = 0
+    loop do
+      tries += 1
+      return nil if tries > 100
+      zip = valid_zip
+      place = Oj.load(
+        `curl http://zip.elevenbasetwo.com/v2/US/#{zip}`
+      ).with_indifferent_access.merge(zip: zip)
+      break if opts.nil? || opts.all?{|k,v| place[k].nil? || (place[k].downcase == v.downcase)}
+    end
+    return place
+  end      
 end
