@@ -60,8 +60,8 @@ module Shopifydev
   def upload_dir(upload_dir)
     # upload all assets in the given dir
 
-    Dir[upload_dir + "/*"].each do |remote_key|
-      self.upload(remote_key)
+    Dir[upload_dir + "/**/*"].each do |remote_key|
+      self.upload([remote_key].squeeze("/"))
     end
   end
 
