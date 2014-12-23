@@ -46,9 +46,14 @@ module Shopifydev
 
     modified = porcelain.scan(/^[ AM][M](.*)/).flatten.each {|f| f.strip!}
 
-    remote_keys = modified.delete_if do |file|
-      not ["assets", "snippets", "templates", "layout"].include?(file.split('/')[0].strip)
+    puts modified.inspect
+
+    top_level = ["assets", "snippets", "templates", "layout"]
+    remote_keys = modified.select do |file|
+        file.split('/').any? { |f| top_level.include?(f) }
     end
+
+    puts remote_keys.inspect
 
     remote_keys.each do |file|
       `git add #{file}`
