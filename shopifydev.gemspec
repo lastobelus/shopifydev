@@ -38,8 +38,9 @@ Gem::Specification.new do |gem|
 
   # for generators
   gem.add_development_dependency "rake"
+  gem.add_development_dependency "rspec"
 
   # for fixtures
-  gem.add_dependency 'ffaker'
+  gem.add_dependency 'ffaker', ">= 2.0"
   
 end
