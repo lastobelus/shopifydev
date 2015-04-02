@@ -77,13 +77,13 @@ module Shopifydev
       def us_address_attrs(opts={})
         require_relative 'valid_zip'
         place = ValidZip.valid_place
-        first_name = ::Faker::Name.first_name
-        last_name  = ::Faker::Name.last_name
+        first_name = ::FFaker::Name.first_name
+        last_name  = ::FFaker::Name.last_name
         attrs = {
           first_name:   first_name,
           last_name:    last_name,
-          address1:     ::Faker::AddressUS.street_address,
-          phone:        ::Faker::PhoneNumber.phone_number,
+          address1:     ::FFaker::AddressUS.street_address,
+          phone:        ::FFaker::PhoneNumber.phone_number,
           city:         place[:city],
           province:     place[:state],
           country:      "US",
@@ -96,13 +96,13 @@ module Shopifydev
       def cad_address_attrs(opts={})
         require_relative 'valid_postal_code'
         place = ValidPostalCode.valid_place
-        first_name = ::Faker::Name.first_name
-        last_name  = ::Faker::Name.last_name
+        first_name = ::FFaker::Name.first_name
+        last_name  = ::FFaker::Name.last_name
         attrs = {
           first_name:   first_name,
           last_name:    last_name,
-          address1:     ::Faker::AddressCA.street_address,
-          phone:        ::Faker::PhoneNumber.phone_number,
+          address1:     ::FFaker::AddressCA.street_address,
+          phone:        ::FFaker::PhoneNumber.phone_number,
           city:         place[:city],
           province:     place[:province],
           country:      "CA",
@@ -152,7 +152,7 @@ module Shopifydev
           billing_address: billing_address,
           shipping_address: shipping_address,
           financial_status: 'paid',
-          email: ::Faker::Internet.email
+          email: ::FFaker::Internet.email
         }.deep_merge(@order_defaults).deep_merge(opts)
       end
 

@@ -1690,7 +1690,7 @@ module ValidPostalCode
  end
  def self.valid_place
    place = valid_fsa
-   place[:postal_code] = place.delete(:fsa) + " " + ::Faker.bothify('#?#').upcase
+   place[:postal_code] = place.delete(:fsa) + " " + ::FFaker.bothify('#?#').upcase
    place
  end
 end

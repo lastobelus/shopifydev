@@ -2,7 +2,7 @@ require 'ffaker'
 require 'shopify_api'
 module Shopifydev
   module Faker
-    extend ::Faker::ModuleUtils
+    extend ::FFaker::ModuleUtils
     extend self
 
     NL = "\n"
@@ -31,7 +31,7 @@ module Shopifydev
     def namespace
       s = ''
       loop do
-        word = ::Faker::Lorem.word[0..rand(10)].downcase
+        word = ::FFaker::Lorem.word[0..rand(10)].downcase
         word = '.' + word if s.length > 0
         if (s.length + word.length) < 21
           s += word 
@@ -44,12 +44,12 @@ module Shopifydev
 
     def key
       k = ""
-      while((k = ::Faker::Lorem.word).length < 3);end
+      while((k = ::FFaker::Lorem.word).length < 3);end
       k.downcase
     end
 
     def value
-      ::Faker::Lorem.sentence(rand(10) + 1)
+      ::FFaker::Lorem.sentence(rand(10) + 1)
     end
 
     def csv_value
